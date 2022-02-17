@@ -1,0 +1,2 @@
+echo "Importing product data...."
+mongoimport --db=eventsshop --collection=listings --file=/data/listings.json --jsonArray --upsertFields=Id --mode=upsert --username=admin --password=admin --authenticationDatabase=admin
