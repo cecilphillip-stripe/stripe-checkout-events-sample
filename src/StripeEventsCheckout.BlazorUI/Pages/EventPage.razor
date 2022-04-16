@@ -141,7 +141,7 @@
 
 @code {
     [Parameter]
-    public string ProductId {get;set;}
+    public string ProductId {get;set;} = string.Empty;
 
     public EventInfo? Event {get;set;}
     public string BackgroundImageUrl => $"background-image:url('{@Event.Images[0]}')";

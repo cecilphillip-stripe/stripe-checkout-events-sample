@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace StripeEventsCheckout.BlazorUI.Models;
@@ -6,20 +5,20 @@ namespace StripeEventsCheckout.BlazorUI.Models;
 public class EventInfo
 {
     [JsonPropertyName("price_id")]
-    public string StripePriceId { get; set; }
+    public string StripePriceId { get; set; } = string.Empty;
 
     [JsonPropertyName("product_id")]
-    public string StripeProductId { get; set; }
+    public string StripeProductId { get; set; }= string.Empty;
 
     [JsonPropertyName("owner")]
-    public string Owner { get; set; }
+    public string Owner { get; set; }= string.Empty;
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; }= string.Empty;
 
     [JsonPropertyName("unit_amount")]
     public long Amount { get; set; }
 
     [JsonPropertyName("images")]
-    public string[] Images { get; set; }
+    public string[] Images { get; set; } = Array.Empty<string>();
 }

@@ -35,6 +35,6 @@
     protected override async Task OnInitializedAsync()
     {
         var client = ClientFactory.CreateClient("Base");
-        Events = await client.GetFromJsonAsync<IEnumerable<EventInfo>>("/api/events/available");
+        Events = await client!.GetFromJsonAsync<IEnumerable<EventInfo>>("/api/events/available");
     }
 }
