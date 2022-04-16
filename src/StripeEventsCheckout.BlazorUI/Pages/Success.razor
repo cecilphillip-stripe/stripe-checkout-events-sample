@@ -1,0 +1,76 @@
+@page "/success"
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+ <main>
+        <div class="relative bg-white py-16 sm:py-24 lg:py-12">
+          <div class="relative">            
+            <div class="text-center mx-auto mb-8 max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl">
+              <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+              Enjoy the event!
+              </p>
+              <p class="mt-5 mx-auto max-w-prose text-md text-gray-500">
+              We'll email you a receipt at the email you specified during checkout
+              </p>
+            </div>
+
+            <div class="mb-20 mx-auto max-w-md px-4">
+             @if(CurrentEvent != null) {
+              <div class="flex flex-col shadow-xl overflow-hidden">
+                <div class="flex-shrink-0">
+                  <img class="h-64 w-full object-cover object-top" src="@CurrentEvent.Images[0]" alt="" />
+                </div>
+                <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+                  <div class="flex-1">
+                    <div class="block mt-2">
+                      <div class="text-xl font-semibold text-gray-900">
+                        CurrentEvent.Name
+                      </div>
+                      <div style="color:#f05537" class="mt-1 text-sm">
+                        Fri, Oct 8, 3:00 PM
+                      </div>
+                      <div class="mt-3 text-base text-gray-500">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex items-center">
+                    <div>
+                      <div class="text-sm mb-4 font-medium text-gray-900">
+                        District 6 Bay Events
+                      </div>
+                      <div class="text-sm font-medium text-gray-900">
+                        <div class="flex space-x-1 text-sm text-gray-900">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          5.1 followers
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             }
+              <div class="hover:underline mt-8 p-4 mx-auto text-center font-bold text-gray-600 hover:font-underline cursor-pointer">
+                <NavLink href="/">Back to events</NavLink>                  
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+  
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "session_id")]
+    public string? SessionId { get; set; }
+    
+    public EventInfo CurrentEvent {get;set;}
+    
+    protected override async Task OnInitializedAsync()
+    {
+      CurrentEvent = await sessionStorage.GetItemAsync<EventInfo>("current_event");
+      await sessionStorage.RemoveItemAsync("current_event");
+    }
+}

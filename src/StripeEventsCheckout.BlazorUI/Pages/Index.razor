@@ -1,0 +1,40 @@
+﻿@page "/"
+
+@inject IHttpClientFactory ClientFactory
+@inject ILogger<Index> Logger
+
+<PageTitle>Index</PageTitle>
+
+<div class="flex-grow relative bg-white py-16 sm:py-24 lg:py-28">
+    <div class="relative">
+        <div class="text-center mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl">
+            <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                Events
+            </p>
+            <p class="mt-5 mx-auto max-w-prose text-xl text-gray-500">
+                Phasellus lorem quam molestie id quisque diam aenean nulla in. Accumsan in quis quis nunc, ullamcorper
+                malesuada. Eleifend condimentum id viverra nulla.
+            </p>
+        </div>
+        <div class="mt-12 mx-auto max-w-md px-4 grid gap-8 sm:max-w-lg sm:px-6 lg:grid-cols-4 lg:max-w-7xl">
+            @if(Events == null) {
+                <div>Nothing to see here</div>
+            } else {
+                @foreach(var evt in Events) {
+                    <EventCard Event="evt" />
+                }
+            }
+            
+        </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<EventInfo> Events {get;set;} = Enumerable.Empty<EventInfo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = ClientFactory.CreateClient("Base");
+        Events = await client.GetFromJsonAsync<IEnumerable<EventInfo>>("/api/events/available");
+    }
+}

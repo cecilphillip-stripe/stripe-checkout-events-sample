@@ -1,0 +1,168 @@
+@page "/event/{productId}"
+
+@inject NavigationManager NavManager
+@inject IHttpClientFactory ClientFactory
+@inject ILogger<Index> Logger
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<PageTitle>Event Page</PageTitle>
+
+@if(Event != null) 
+{
+    <div class="absolute w-full h-1/3 bg-gray-50 overflow-hidden z-0">
+        <div>
+            <img class="w-screen filter blur-2xl" src="@Event.Images[0]" />
+        </div>
+    </div>
+    <div class="flex-grow relative py-16 sm:py-24 lg:py-12 max-w-5xl mx-auto">
+        <div class="relative bg-white rounded shadow">
+            <div class="flex">
+                <div class="w-2/3 h-96 bg-center bg-cover bg-no-repeat" style="@BackgroundImageUrl">
+                </div>
+                <div class="w-1/3 p-6 bg-gray-100">
+                    <div class="uppercase text-lg font-light">
+                        Oct<br />08
+                    </div>
+                    <div class="mt-4 text-xl font-semibold">
+                        @Event.Name
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">
+                        @Event.Owner
+                    </div>
+                    <div class="flex mt-2">
+                        <div class="mt-1 text-sm text-gray-500">
+                            6592 Followers
+                        </div>
+                        <div
+                            class="border-blue-700 border-2 rounded bg-white font-extabold text-blue-700 py-1 px-3 font-bold text-xs ml-2">
+                            Follow
+                        </div>
+                    </div>
+                    <div class="mt-8 text-gray-500">
+                        $@(Event.Amount / 100.00m)
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-b p-4">
+                <div class="flex justify-between">
+                    <div class="flex space-x-2 items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    <button class="bg-green-600 hover:bg-green-500 px-32 rounded text-center text-white text-sm font-semibold
+                        p-3" @onclick="StartCheckoutSession">Tickets</button>
+                </div>
+            </div>
+            <div class="flex text-gray-600 font-light mt-2 p-14">
+                <div class="w-2/3 pr-16">
+                    <div class="font-medium text-md">
+                        About this event
+                    </div>
+                    <div class="mt-8">
+                        <span class="font-medium">NOTE: </span>Tickets will only be available online through Eventbrite. No
+                        tickets will be sold at the door. Please purchase your tickets in advance.
+                    </div>
+
+                    <div class="mt-8">
+                        <span class="font-medium">Vendor Lineup:</span> Click Here
+                    </div>
+                    <div class="mt-8">
+                        <span class="font-medium">Pre-sale tickets:</span> $7 per person
+                    </div>
+
+                    <div class="mt-8">
+                        <span class="font-medium">Tickets after Sat, October 2nd:</span> $10 per person
+                    </div>
+
+                    <div class="mt-8">
+                        Children under 5 are admitted for free.
+                    </div>
+                    <div class="mt-8">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean in arcu ipsum. Maecenas lorem est,
+                        ornare sit amet leo sed, feugiat ultrices purus. Vestibulum sed commodo leo. Curabitur eu nisl sed
+                        quam tristique vestibulum ac et diam. Fusce quis ipsum vitae metus aliquam maximus sed vitae mauris.
+                        Fusce at nisi at nisi tempus elementum sit amet a enim. Nulla leo libero, consequat sit amet
+                        volutpat sit amet, ultrices eget dolor. Nam porta egestas erat vitae semper. Vivamus elementum
+                        placerat augue, non suscipit justo cursus at. Suspendisse pharetra hendrerit dui eu facilisis.
+                    </div>
+
+                    <div class="mt-8">
+                        Vestibulum ornare magna vel odio feugiat, ut dapibus risus imperdiet. Maecenas lobortis elit ac urna
+                        gravida vehicula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lacinia venenatis
+                        nunc, vitae porta ipsum malesuada vel. Nam ornare turpis sed ex vehicula, ac lacinia leo
+                        consectetur. Morbi mattis vehicula ante vitae tincidunt. Cras vitae metus quis neque accumsan tempor
+                        sed volutpat ex. Donec in quam lorem. Etiam feugiat nisl ut mollis fermentum. Phasellus augue
+                        sapien, tempus sed purus ac, placerat vehicula nunc. Vestibulum leo libero, malesuada quis laoreet
+                        id, dapibus nec diam. Donec mattis ut tellus non sollicitudin. Maecenas accumsan nisi nec urna
+                        aliquam rhoncus. Proin egestas volutpat quam, sed condimentum risus pellentesque in. Praesent nunc
+                        erat, vulputate eu luctus a, tincidunt in augue.
+                    </div>
+                    <div class="mt-8">
+                        Etiam efficitur purus eget turpis dapibus, at faucibus odio consectetur.
+                    </div>
+                </div>
+                <div class="w-1/3">
+                    <div class="font-medium mb-3">
+                        Date and Time
+                    </div>
+                    <div class="text-sm">
+                        Fri, Oct 8, 2021, 3:00 PM –<br />
+                        Sun, Oct 10, 2021, 10:00 PM PDT<br />
+                        <span class="text-blue-600">Add to calendar</span>
+                    </div>
+
+                    <div class="mt-6 font-medium mb-3">
+                        Location
+                    </div>
+                    <div class="text-sm">
+                        Golden Gate Fields<br />
+                        1100 Eastshore Highway<br />
+                        Berkeley, CA 94710<br />
+                        <span class="text-blue-600">View Map</span>
+                    </div>
+
+                    <div class="mt-6 text-sm">
+                        Refund policy<br />
+                        Refunds up to 7 days before event<br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string ProductId {get;set;}
+
+    public EventInfo? Event {get;set;}
+    public string BackgroundImageUrl => $"background-image:url('{@Event.Images[0]}')";
+   
+    protected override async Task OnInitializedAsync()
+    {
+        try {
+            var client = ClientFactory.CreateClient("Base");
+            Event = await client.GetFromJsonAsync<EventInfo>($"/api/events/{ProductId}");
+            await sessionStorage.SetItemAsync("current_event", Event);
+        }
+        catch(Exception ex) {
+            Logger.LogError(ex, "Oh oh... that's not good!");
+        }
+    }
+
+    protected async Task StartCheckoutSession()
+    {
+        var client = ClientFactory.CreateClient("Base");
+        var resp = await client.PostAsJsonAsync($"/api/events/checkout", new { priceId = Event.StripePriceId, quantity = 1 });
+        var payload = await resp.Content.ReadFromJsonAsync<CheckSessionResponse>();
+        NavManager.NavigateTo(payload.Url);
+    }
+}
