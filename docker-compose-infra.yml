@@ -1,20 +1,32 @@
 version: "3.8"
 
 services:
+
   ##### MongoDB #####
   mongodb:
     container_name: mongodb
-    image: mongo:5.0.6
+    image: mongo:5.0.7
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
       - MONGO_INITDB_DATABASE=eventsshop
     volumes:
-      - ./demo_data/recipes.json:/data/listings.json
+      - ./demo_data/listings.json:/data/listings.json
       - ./demo_data/populate.sh:/docker-entrypoint-initdb.d/populate.sh
       - ./tmp/mongo/data/db:/data/db
     ports:
       - "27017:27017"
+
+  ##### Seq #####
+  seq:
+    container_name: "seq_service"
+    image: datalust/seq:2022.1
+    environment:
+      - ACCEPT_EULA=Y
+    volumes:
+      - ./tmp/seq/data:/data
+    ports:
+      - "8191:80"
 networks:
   default:
     name: checkoutevents

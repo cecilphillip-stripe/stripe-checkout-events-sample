@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  ##### StripeEvents Checkout App #####
+  webapp:
+    build:
+      context: ./src/
+      dockerfile: Dockerfile.ApiServer
+    container_name: checkoutevents_server
+    env_file:
+      - src/StripeEventsCheckout.ApiServer/.env
+      - .env
+    ports:
+      - "5276:5276"
+networks:
+  default:
+    name: checkoutevents
+    external: true
