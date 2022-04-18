@@ -1,4 +1,4 @@
-# Events Storefront sample using Stripe Checkout
+# Events Storefront sample integration using Stripe Checkout
 
 ## What's in the box
 This sample is split into two projects
@@ -54,3 +54,26 @@ dotnet run --project StripeEventsCheckout.ApiServer
 ```
 
 By default, the application should start running on http://localhost:5276
+
+### [**Optional**] Run the application in Docker 👨🏽‍💻
+The repo contains a Dockerfile and docker-compose files to quickly spin up the project running in containers on your local Docker instance.
+
+> To run the containers locally, you'll need to have [Docker](https://www.docker.com/products/personal/) installed on your machine.
+
+**File Listing**
+* [Dockerfile.ApiServer](./src/Dockerfile.ApiServer) - The Dockerfile definition to build the Blazor frontend and API Backend.
+* [docker-compose-app.yml](./docker-compose-app.yml) - Docker compose file to spin up the application.
+* [docker-compose-infra.yml](./docker-compose-infra.yml) - Docker compose file to spin up some additional services.
+
+| Service | Local Port(s) | 
+| :-------------- | :---------: | 
+| [Stripe Events Web App](src/StripeEventsCheckout.ApiServer/) |5276  |
+| [Mongo DB](https://www.mongodb.com/try/download/community) | 27017 |
+| [Seq](https://datalust.co/seq) | 8191 |
+
+**Run the containers**
+
+Run the following command from the root directory of the project
+```bash
+> docker compose -f docker-compose-app.yml -f docker-compose-infra.yml up
+```
