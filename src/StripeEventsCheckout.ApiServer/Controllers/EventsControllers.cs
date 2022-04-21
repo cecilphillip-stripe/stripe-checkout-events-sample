@@ -61,6 +61,10 @@ public class EventsController : ControllerBase
             {
                 Promotions = "auto"
             },
+            PhoneNumberCollection = new()
+            {
+                Enabled = true,
+            },
             ShippingAddressCollection = new()
             {
                 AllowedCountries = new List<string> { "US" }

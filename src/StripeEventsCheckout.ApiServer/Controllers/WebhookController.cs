@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
 using StripeEventsCheckout.ApiServer.Models.Config;
+using StripeEventsCheckout.ApiServer.Services;
 
 namespace StripeEventsCheckout.ApiServer.Controllers;
 
@@ -9,11 +10,15 @@ namespace StripeEventsCheckout.ApiServer.Controllers;
 [Route("[controller]")]
 public class WebhookController : ControllerBase
 {
+    private readonly IStripeClient _stripeClient;
+    private readonly IMessageSender _messenger;
     private readonly ILogger<WebhookController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
 
-    public WebhookController(ILogger<WebhookController> logger, IOptions<StripeOptions> stripeConfig)
+    public WebhookController(IStripeClient stripeClient, IMessageSender messenger, ILogger<WebhookController> logger, IOptions<StripeOptions> stripeConfig)
     {
+        _stripeClient = stripeClient;
+        _messenger = messenger;
         _logger = logger;
         _stripeConfig = stripeConfig;
     }
@@ -37,6 +42,21 @@ public class WebhookController : ControllerBase
             {
                 var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
                 _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}, Status: {checkoutSession.Status}");
+
+                if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
+                {
+                    try
+                    {
+                        var customerService = new CustomerService(_stripeClient);
+                        var customer = await customerService.GetAsync(checkoutSession.CustomerId);
+                        await _messenger.SendMessageAsync("Your order has been successfully processed", customer.Phone);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, ex.Message);
+                    }
+                }
+
             }
 
             else if (stripeEvent.Type == Events.CheckoutSessionExpired)
@@ -45,6 +65,7 @@ public class WebhookController : ControllerBase
                 _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}");
 
                 // Notify your customer about the cart
+
             }
             else
             {

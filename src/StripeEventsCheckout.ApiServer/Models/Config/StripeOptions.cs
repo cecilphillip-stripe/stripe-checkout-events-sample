@@ -1,5 +1,4 @@
 namespace StripeEventsCheckout.ApiServer.Models.Config;
-
 public class StripeOptions
 {
     public string PublicKey { get; set; } = string.Empty;

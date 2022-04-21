@@ -3,6 +3,8 @@ using MongoDB.Driver.Linq;
 using Stripe;
 using StripeEventsCheckout.ApiServer.Data;
 using StripeEventsCheckout.ApiServer.Models.Config;
+using Twilio;
+using Twilio.Clients;
 
 public static class ServiceCollectionExtensions
 {
@@ -54,6 +56,34 @@ public static class ServiceCollectionExtensions
             return new StripeClient(apiKey: StripeConfiguration.ApiKey, httpClient: httpClient);
         });
 
+        return services;
+    }
+
+    public static IServiceCollection AddTwilio(this IServiceCollection services, IConfiguration config)
+    {
+        string accountSid = config["ACCOUNT_SID"];
+        string authToken = config["AUTH_TOKEN"];
+        string phoneNumber = config["PHONE_NUMBER"];
+
+        services.Configure<TwilioOptions>(options =>
+        {
+            options.AccountSID = accountSid;
+            options.AuthToken = authToken;
+            options.PhoneNumber = phoneNumber;
+        });
+
+        TwilioClient.Init(accountSid, authToken);
+
+        services.AddHttpClient("Twilio");
+        services.AddTransient<ITwilioRestClient, TwilioRestClient>(s =>
+        {
+            var clientFactory = s.GetRequiredService<IHttpClientFactory>();
+            var twilioRestClient = new TwilioRestClient(accountSid, authToken,
+                     httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
+            TwilioClient.SetRestClient(twilioRestClient);
+
+            return twilioRestClient;
+        });
         return services;
     }
 }
