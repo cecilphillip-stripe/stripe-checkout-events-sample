@@ -1,3 +1,4 @@
+using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using StripeEventsCheckout.ApiServer.Services;
 
@@ -12,7 +13,12 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("STRIPE"));
 builder.Services.AddTwilio(builder.Configuration.GetSection("TWILIO"));
-builder.Services.AddTransient<IMessageSender, TwilioMessageSender>();
+builder.Services.AddSendGrid(options =>
+{
+    options.ApiKey = builder.Configuration["SENDGRID:APIKEY"];
+});
+
+builder.Services.AddTransient<IMessageSender, SendGridMessageSender>();
 builder.Services.AddControllers();
 
 var app = builder.Build();

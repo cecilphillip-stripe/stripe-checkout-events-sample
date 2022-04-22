@@ -49,7 +49,15 @@ public class WebhookController : ControllerBase
                     {
                         var customerService = new CustomerService(_stripeClient);
                         var customer = await customerService.GetAsync(checkoutSession.CustomerId);
-                        await _messenger.SendMessageAsync("Your order has been successfully processed", customer.Phone);
+
+                        var recipient = _messenger switch
+                        {
+                            TwilioMessageSender => customer.Phone,
+                            SendGridMessageSender => customer.Email,
+                            _ => throw new ArgumentException("Unsupported Type")
+                        };
+
+                        await _messenger.SendMessageAsync("Your order has been successfully processed", recipient);
                     }
                     catch (Exception ex)
                     {
