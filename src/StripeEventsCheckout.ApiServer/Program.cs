@@ -1,4 +1,5 @@
 using Serilog;
+using StripeEventsCheckout.ApiServer.Services;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ Log.Logger = new LoggerConfiguration()
 // Add services to the container.
 builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("STRIPE"));
+builder.Services.AddTwilio(builder.Configuration.GetSection("TWILIO"));
+builder.Services.AddTransient<IMessageSender, TwilioMessageSender>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
