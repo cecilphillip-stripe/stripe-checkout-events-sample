@@ -2,13 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": ".NET Core Launch (web)",
+            "name": ".NET Launch API Server",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build API",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/StripeEventsCheckout.ApiServer/bin/Debug/net6.0/StripeEventsCheckout.ApiServer.dll",
             "args": [],
@@ -24,6 +21,21 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": ".NET Launch CLI Tools",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Tools",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/StripeEventsCheckout.Tools/bin/Debug/net6.0/dotnet-striped.dll",
+            "args": ["status"],
+            "cwd": "${workspaceFolder}/src/StripeEventsCheckout.Tools",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_ENVIRONMENT": "Development"
             }
         },
         {

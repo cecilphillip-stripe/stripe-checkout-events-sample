@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Local Stripe CLI utilities</Description>
+    <Authors>Cecil L. Phillip</Authors>
+    <Product>dotnet-striped</Product>
+    <Copyright>Copyright © Cecil phillip</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>    
+    <RepositoryType>git</RepositoryType>        
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootNamespace>StripeEventsCheckout.Tools</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>dotnet-striped-tool</PackageId>
+    <ToolCommandName>dotnet-striped</ToolCommandName>
+    <AssemblyName>dotnet-striped</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="Stripe.net" Version="39.107.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
+    <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22114.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

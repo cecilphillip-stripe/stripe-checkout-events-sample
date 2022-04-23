@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build API",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -14,26 +14,14 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "build Tools",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",
-                "${workspaceFolder}/src/StripeEventsCheckout.ApiServer/StripeEventsCheckout.ApiServer.csproj",
+                "build",
+                "${workspaceFolder}/src/StripeEventsCheckout.Tools/StripeEventsCheckout.Tools.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/src/StripeEventsCheckout.ApiServer/StripeEventsCheckout.ApiServer.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
