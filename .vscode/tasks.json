@@ -19,11 +19,23 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/StripeEventsCheckout.Tools/StripeEventsCheckout.Tools.csproj",
+                "${workspaceFolder}/src/StripeEventsCheckout.Tools/StripeEventsCheckout.ApiServer.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+        {
+            "label": "pack Tools",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "pack",
+                "${workspaceFolder}/src/StripeEventsCheckout.Tools/StripeEventsCheckout.ApiServer.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
     ]
 }

@@ -5,12 +5,13 @@
     <Authors>Cecil L. Phillip</Authors>
     <Product>dotnet-striped</Product>
     <Copyright>Copyright © Cecil phillip</Copyright>
-    <NeutralLanguage>en-US</NeutralLanguage>    
-    <RepositoryType>git</RepositoryType>        
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup>
     <RootNamespace>StripeEventsCheckout.Tools</RootNamespace>
+    <Version>1.0.0-beta</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -35,5 +36,4 @@
     <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22114.1" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
-
 </Project>
