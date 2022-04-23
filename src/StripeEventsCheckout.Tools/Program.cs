@@ -74,11 +74,18 @@ async Task StatusHandler(IHost host)
     try
     {
         var response = await client.GetAsync("https://status.stripe.com/current");
-        var payload = await response.Content.ReadFromJsonAsync<JsonDocument>();
-        var statusMessage = payload!.RootElement.GetProperty("message").GetString();
+        var payload = await response.Content.ReadFromJsonAsync<StripeStatusResponse>();
+        var statusMessage = payload!.Message;
+        var sStats = payload.Statuses;
+
+        var statusColor = (sStats.Api, sStats.Checkoutjs, sStats.Dashboard, sStats.Stripejs) switch
+        {
+            ("up", "up", "up", "up") => "green",
+            (not "up", not "up", not "up", not "up") => "red",
+            _ => "orange3"
+        };
 
         var asm = Assembly.GetEntryAssembly();
-
         var versionString = asm?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
                                 .InformationalVersion
                                 .ToString();
@@ -86,7 +93,7 @@ async Task StatusHandler(IHost host)
 
         var content = new Markup(
             $"[white]Version: {versionString}[/]\n" +
-            $"Status: [green]{statusMessage}[/]"
+            $"Status: [{statusColor}]{statusMessage}[/]"
         );
 
         var panel = new Panel(content)
@@ -94,7 +101,6 @@ async Task StatusHandler(IHost host)
                 .Header($"[white]Name: {asmName}[/]")
                 .HeaderAlignment(Justify.Center);
         AnsiConsole.Write(panel);
-
     }
     catch (JsonException)
     {
@@ -143,3 +149,7 @@ async Task SetupHandler(IHost host)
         AnsiConsole.MarkupLine($"[Green]Created {newProduct.Name} - {newProduct.Id} - ${prodPrice.UnitAmount / 100m}[/] \n");
     }
 }
+
+public record StripeStatusResponse(StripeStatuses Statuses, string Largestatus, string Message, string Time);
+
+public record StripeStatuses(string Api, string Dashboard, string Stripejs, string Checkoutjs);
