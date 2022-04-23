@@ -1,9 +1,10 @@
 # Events Storefront sample integration using Stripe Checkout
 
 ## What's in the box
-This sample is split into two projects
+This sample is split into a few  projects
 * [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) - ASP.NET Core HTTP API backend that hosts endpoints for managing the checkout session and wehbooks
 * [StripeEventsCheckout.BlazorUI/](src/StripeEventsCheckout.BlazorUI/) - Frontend UI built with Blazor and Tailwind CSS.
+* [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) - .NET CLI tool for seeding Stripe product data
 
 ## Requirements
 * .NET SDK 6.0+ 
@@ -37,6 +38,29 @@ stripe listen --forward-to localhost:5276/webhook
 ```
 
 This command will return the webhook secret that you'll add to the `STRIPE__WEBHOOK_SECRET` configuration key in your `.env` file.
+
+### Seeding data into the Stripe Dashboard
+The [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) project contains the source for a .NET ClI tool (`dotnet-striped`) that you can use to load product data into your Stripe account. There are a few way you can run this tool
+
+The [nupkg](src/StripeEventsCheckout.Tools/nupkg/) contains the tool already bundled as a nuget package. To install and execute `dotnet-striped` as a [local tool](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use), run the follow commands from the `src/` directory.
+
+```shell
+> dotnet tool install --add-source ./StripeEventsCheckout.Tools/nupkg dotnet-striped-tool
+> dotnet striped status
+```
+
+If the tool is installed correctly and the Stripe API is accessible, you should see "**All services are online.**" printed to the terminal.
+
+Next, populate the `STRIPE__SECRET_KEY` environment variable with your Stripe secret key. If you're using bash or zsh, the follow command will export the variables in your `.env` file to the current terminal session.
+
+```shell
+> set -o allexport; source .env; set +o allexport
+```
+
+To load the test data into your Stripe account, execute the following
+```shell
+> dotnet striped setup
+```
 
 ### Run the code 👨🏽‍💻
 Navigate into the src/ directory
