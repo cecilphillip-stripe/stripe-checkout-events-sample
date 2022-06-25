@@ -1,8 +1,5 @@
-using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using StripeEventsCheckout.ApiServer.Models.Config;
-
 
 namespace StripeEventsCheckout.ApiServer.Services;
 
@@ -20,7 +17,7 @@ public class SendGridMessageSender : IMessageSender
     }
     public async Task SendMessageAsync(string message, string receiver)
     {
-        var from = new EmailAddress(_configuration["SENDGRID:FROMADDRESS"], "Stripe Event Demo");
+        var from = new EmailAddress(_configuration["SendGrid:FromAddress"], "Stripe Event Demo");
         var to = new EmailAddress(receiver);
 
         var msg = new SendGridMessage
@@ -29,7 +26,7 @@ public class SendGridMessageSender : IMessageSender
             Subject = "Your ticket order is complete"
         };
 
-        msg.AddContent(MimeType.Text, message);
+        msg.AddContent(MimeType.Text, message);        
         msg.AddTo(to);
 
         var emailResponse = await _sendGridClient.SendEmailAsync(msg);

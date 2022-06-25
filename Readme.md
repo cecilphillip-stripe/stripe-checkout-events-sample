@@ -8,12 +8,12 @@ This sample is split into a few  projects
 
 ## Requirements
 * .NET SDK 6.0+ 
-* A FREE [Stripe Account](https://dashboard.stripe.com/register)
+* A [Stripe Account](https://dashboard.stripe.com/register)
 * [Stripe CLI](https://stripe.com/docs/stripe-cli)
 
 
 ## Running the demo
-### Step1: Obtain your Stripe Keys 🕵🏽‍♂️
+### Step 1: Obtain your Stripe Keys 🕵🏽‍♂️
 Before running the code, you'll need to retrieve your Stripe Secret Key from your account dashboard.
 * Log in to your [Stripe Dashboard](https://dashboard.stripe.com/)
 * Make sure you're in test mode. The toggle is located at the top right corner of the page.
@@ -21,60 +21,38 @@ Before running the code, you'll need to retrieve your Stripe Secret Key from you
 * Under `Standard Keys`, reveal and copy your `Secret key`.
 
 > You can learn more about API Keys and Modes at this link => https://stripe.com/docs/keys
-* Copy and rename the `.env.sample` file to a `.env` in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/).
-* Add your keys to the `.env` configuration file in the [SimpleCheckoutServer](src/SimpleCheckoutServer) project.
+* Update the `appsettings.json` file located in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) with your Stripe Publishable Key and Secret Key
 
-```bash
-STRIPE__PUBLISHABLE_KEY=<YOUR_KEY>
-STRIPE__SECRET_KEY=<YOUR_KEY>
-STRIPE__WEBHOOK_SECRET=<YOUR_SECRET>
+```json
+"Stripe": {
+    "PublishableKey": "",
+    "SecretKey": "",
+    "WebhookSecrety": ""
+  },
 ```
 
-### Step2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
+### Step 2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
 Use the `stripe listen` command with the `--forward-to` flag to stream stripe events from your account in test mode to your local webhook endpoint.
 
 ```bash
 stripe listen --forward-to localhost:5276/webhook
 ```
 
-This command will return the webhook secret that you'll add to the `STRIPE__WEBHOOK_SECRET` configuration key in your `.env` file.
+This command will return the webhook secret that you'll add to the `WebhookSecret` configuration key in your `appsettings.json` file.
 
-### Step3: Seeding data into the Stripe Dashboard
-The [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) project contains the source for a .NET ClI tool (`dotnet-striped`) that you can use to load product data into your Stripe account. There are a few way you can run this tool
+### Step 3: Seeding data into the Stripe Dashboard
+The `appsettings.json` file has a configuration property called `SeedProductData`. Set it to `true` to initiate seeding product and pricing data.
 
-The [nupkg](src/StripeEventsCheckout.Tools/nupkg/) contains the tool already bundled as a nuget package. To install and execute `dotnet-striped` as a [local tool](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use), run the follow commands from the `src/` directory.
-
-```shell
-> dotnet tool install --add-source ./StripeEventsCheckout.Tools/nupkg dotnet-striped-tool
-> dotnet striped status
-```
-
-If the tool is installed correctly and the Stripe API is accessible, you should see "**All services are online.**" printed to the terminal.
-
-Next, populate the `STRIPE__SECRET_KEY` environment variable with your Stripe secret key. If you're using bash or zsh, the follow command will export the variables in your `.env` file to the current terminal session.
-
-```shell
-> set -o allexport; source .env; set +o allexport
-```
-
-To load the test data into your Stripe account, execute the following
-```shell
-> dotnet striped setup
-```
-
-### Step4: Run the code 👨🏽‍💻
+### Step 4: Run the code 👨🏽‍💻
 Navigate into the src/ directory
 ```shell
 cd  src/
 ```
 
-Run the build. This will restore both the node and .NET packages.
-```shell
-dotnet build
-```
 Run the project
 ```shell
-dotnet run --project StripeEventsCheckout.ApiServer
+> dotnet build
+> dotnet run --project StripeEventsCheckout.ApiServer
 ```
 
 By default, the application should start running on http://localhost:5276

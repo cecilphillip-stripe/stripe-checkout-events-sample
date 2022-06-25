@@ -28,13 +28,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration config)
     {
-        StripeConfiguration.ApiKey = config["SECRET_KEY"];
-        services.Configure<StripeOptions>(options =>
-        {
-            options.WebhookSecret = config["WEBHOOK_SECRET"];
-            options.PublicKey = config["PUBLISHABLE_KEY"];
-            options.SecretKey = StripeConfiguration.ApiKey;
-        });
+        StripeConfiguration.ApiKey = config["SecretKey"];
+        services.Configure<StripeOptions>(config);
 
         var appInfo = new AppInfo
         {
@@ -61,25 +56,18 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddTwilio(this IServiceCollection services, IConfiguration config)
     {
-        string accountSid = config["ACCOUNT_SID"];
-        string authToken = config["AUTH_TOKEN"];
-        string phoneNumber = config["PHONE_NUMBER"];
-
-        services.Configure<TwilioOptions>(options =>
-        {
-            options.AccountSID = accountSid;
-            options.AuthToken = authToken;
-            options.PhoneNumber = phoneNumber;
-        });
-
+        string accountSid = config["AccountSID"];
+        string authToken = config["AuthToken"];
         TwilioClient.Init(accountSid, authToken);
 
+        services.Configure<TwilioOptions>(config);
         services.AddHttpClient("Twilio");
         services.AddTransient<ITwilioRestClient, TwilioRestClient>(s =>
         {
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var twilioRestClient = new TwilioRestClient(accountSid, authToken,
                      httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
+
             TwilioClient.SetRestClient(twilioRestClient);
 
             return twilioRestClient;

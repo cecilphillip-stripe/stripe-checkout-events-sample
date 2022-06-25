@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <RootNamespace>StripeEventsCheckout.Tools</RootNamespace>
-    <Version>1.0.0-beta</Version>
+    <Version>0.1.0</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -21,6 +21,8 @@
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageDescription>Local Stripe CLI utilities!</PackageDescription>
+    <RepositoryUrl>https://github.com/cecilphillip-stripe/stripe-checkout-events-sample</RepositoryUrl>
     <PackageId>dotnet-striped-tool</PackageId>
     <ToolCommandName>dotnet-striped</ToolCommandName>
     <AssemblyName>dotnet-striped</AssemblyName>
