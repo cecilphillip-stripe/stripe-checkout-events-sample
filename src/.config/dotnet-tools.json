@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "dotnet-striped-tool": {
-      "version": "1.0.0",
+      "version": "1.0.0-beta",
       "commands": [
         "dotnet-striped"
       ]

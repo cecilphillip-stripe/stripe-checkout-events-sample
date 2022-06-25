@@ -8,12 +8,12 @@ This sample is split into a few  projects
 
 ## Requirements
 * .NET SDK 6.0+ 
-* A FREE [Stripe Account](https://dashboard.stripe.com/register)
+* A [Stripe Account](https://dashboard.stripe.com/register)
 * [Stripe CLI](https://stripe.com/docs/stripe-cli)
 
 
 ## Running the demo
-### Step1: Obtain your Stripe Keys 🕵🏽‍♂️
+### Step 1: Obtain your Stripe Keys 🕵🏽‍♂️
 Before running the code, you'll need to retrieve your Stripe Secret Key from your account dashboard.
 * Log in to your [Stripe Dashboard](https://dashboard.stripe.com/)
 * Make sure you're in test mode. The toggle is located at the top right corner of the page.
@@ -30,7 +30,7 @@ STRIPE__SECRET_KEY=<YOUR_KEY>
 STRIPE__WEBHOOK_SECRET=<YOUR_SECRET>
 ```
 
-### Step2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
+### Step 2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
 Use the `stripe listen` command with the `--forward-to` flag to stream stripe events from your account in test mode to your local webhook endpoint.
 
 ```bash
@@ -39,13 +39,13 @@ stripe listen --forward-to localhost:5276/webhook
 
 This command will return the webhook secret that you'll add to the `STRIPE__WEBHOOK_SECRET` configuration key in your `.env` file.
 
-### Step3: Seeding data into the Stripe Dashboard
+### Step 3: Seeding data into the Stripe Dashboard
 The [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) project contains the source for a .NET ClI tool (`dotnet-striped`) that you can use to load product data into your Stripe account. There are a few way you can run this tool
 
 The [nupkg](src/StripeEventsCheckout.Tools/nupkg/) contains the tool already bundled as a nuget package. To install and execute `dotnet-striped` as a [local tool](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use), run the follow commands from the `src/` directory.
 
 ```shell
-> dotnet tool install --add-source ./StripeEventsCheckout.Tools/nupkg dotnet-striped-tool
+> dotnet tool restore --add-source ./StripeEventsCheckout.Tools/nupkg
 > dotnet striped status
 ```
 
@@ -62,7 +62,7 @@ To load the test data into your Stripe account, execute the following
 > dotnet striped setup
 ```
 
-### Step4: Run the code 👨🏽‍💻
+### Step 4: Run the code 👨🏽‍💻
 Navigate into the src/ directory
 ```shell
 cd  src/
