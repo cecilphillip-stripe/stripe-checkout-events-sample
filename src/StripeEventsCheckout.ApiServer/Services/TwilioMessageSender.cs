@@ -23,11 +23,5 @@ public class TwilioMessageSender : IMessageSender
             to: new Twilio.Types.PhoneNumber(receiver),
             client: _twilioRestClient
         );
-        
     }
-}
-
-public interface IMessageSender
-{
-    Task SendMessageAsync(string message, string receiver);
 }
