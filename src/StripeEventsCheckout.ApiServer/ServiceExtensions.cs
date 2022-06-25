@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration config)
     {
-        StripeConfiguration.ApiKey = config["SECRET_KEY"];
+        StripeConfiguration.ApiKey = config["SecretKey"];
         services.Configure<StripeOptions>(config);
 
         var appInfo = new AppInfo

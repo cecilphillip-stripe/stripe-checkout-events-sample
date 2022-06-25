@@ -143,7 +143,6 @@ async Task SetupHandler(SetupOptions options, IHost host)
             await prodSvc.CreateAsync(prodCreateOptions) :
             await prodSvc.CreateAsync(prodCreateOptions, new() { ApiKey = options.Key });
 
-
         var priceCreateOptions = new PriceCreateOptions
         {
             Product = newProduct.Id,
