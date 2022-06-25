@@ -21,8 +21,8 @@ Before running the code, you'll need to retrieve your Stripe Secret Key from you
 * Under `Standard Keys`, reveal and copy your `Secret key`.
 
 > You can learn more about API Keys and Modes at this link => https://stripe.com/docs/keys
-* Copy and rename the `.env.sample` file to a `.env` in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/).
-* Add your keys to the `.env` configuration file in the [SimpleCheckoutServer](src/SimpleCheckoutServer) project.
+* Copy and rename the `.env.sample` located in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) to a `.env` in the same directory.
+* Add your keys to the `.env` configuration file in the [StripeEventsCheckout.ApiServer](src/SimpleCheckoutServer) project.
 
 ```bash
 STRIPE__PUBLISHABLE_KEY=<YOUR_KEY>
