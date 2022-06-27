@@ -1,18 +1,74 @@
 version: "3.8"
 
 services:
-  ##### StripeEvents Checkout App #####
+  ##### Web App #####
   webapp:
     build:
       context: ./src/
-      dockerfile: Dockerfile.ApiServer
+      dockerfile: ApiServer.Dockerfile
     container_name: checkoutevents_server
     env_file:
-      - src/StripeEventsCheckout.ApiServer/.env
       - .env
     ports:
       - "5276:5276"
+  
+  website_dapr:
+    image: "daprio/daprd:1.7.4"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "website",
+        "-app-port",
+        "5276",
+        "-config",
+        "/dapr/config.yaml",
+        "-components-path",
+        "/dapr/local",
+      ]
+    volumes:
+      - "./.dapr:/dapr"
+    depends_on:
+      - webapp
+    network_mode: "service:webapp"
+    env_file:
+      - .env
+  
+  
+  ##### Order Processor #####
+  orderprocessor:
+    build:
+      context: ./src/
+      dockerfile: OrderProcessor.Dockerfile    
+    env_file:
+      - .env
+    ports:
+      - "5180:5180"
+  
+  orderprocessor_dapr:
+    image: "daprio/daprd:1.7.4"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "orderproessor",
+        "-app-port",
+        "5180",
+        "-config",
+        "/dapr/config.yaml",
+        "-components-path",
+        "/dapr/local",
+      ]
+    volumes:
+      - "./.dapr:/dapr"
+    depends_on:
+      - webapp
+    network_mode: "service:orderprocessor"
+    env_file:
+      - .env
+
 networks:
   default:
     name: checkoutevents
     external: true
+
