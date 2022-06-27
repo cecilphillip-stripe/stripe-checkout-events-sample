@@ -1,6 +1,5 @@
-using SendGrid.Extensions.DependencyInjection;
 using Serilog;
-using StripeEventsCheckout.ApiServer.Services;
+using StripeEventsCheckout.ApiServer;
 using StripeEventsCheckout.ApiServer.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,13 +11,12 @@ Log.Logger = new LoggerConfiguration()
 // Add services to the container.
 builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("Stripe"));
-builder.Services.AddTwilio(builder.Configuration.GetSection("Twilio"));
-builder.Services.AddSendGrid(options =>
+builder.Services.AddHttpClient("dapr", c =>
 {
-    options.ApiKey = builder.Configuration["SendGrid:APIKEY"];
+    c.BaseAddress = new Uri("http://localhost:3500");
+    c.DefaultRequestHeaders.Add("User-Agent", typeof(Program).Assembly.GetName().Name);
 });
 
-builder.Services.AddTransient<IMessageSender, SendGridMessageSender>();
 builder.Services.AddControllers();
 
 if (builder.Configuration.GetValue<bool>("SeedProductData"))

@@ -1,8 +1,9 @@
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
 using StripeEventsCheckout.ApiServer.Models.Config;
-using StripeEventsCheckout.ApiServer.Services;
 
 namespace StripeEventsCheckout.ApiServer.Controllers;
 
@@ -11,15 +12,16 @@ namespace StripeEventsCheckout.ApiServer.Controllers;
 public class WebhookController : ControllerBase
 {
     private readonly IStripeClient _stripeClient;
-    private readonly IMessageSender _messenger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<WebhookController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
+    private const string PUBSUB_NAME = "rabbitmqbus";
 
-    public WebhookController(IStripeClient stripeClient, IMessageSender messenger, ILogger<WebhookController> logger,
+    public WebhookController(IStripeClient stripeClient, IHttpClientFactory httpClientFactory, ILogger<WebhookController> logger,
         IOptions<StripeOptions> stripeConfig)
     {
         _stripeClient = stripeClient;
-        _messenger = messenger;
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
         _stripeConfig = stripeConfig;
     }
@@ -35,54 +37,37 @@ public class WebhookController : ControllerBase
                 _stripeConfig.Value.WebhookSecret
             );
 
-            _logger.LogInformation($"Webhook notification with type: {stripeEvent.Type} found for {stripeEvent.Id}");
+            _logger.LogInformation("Webhook notification with type: {StripeEventType} found for {StripeEventId}", stripeEvent.Type, stripeEvent.Id);
 
             switch (stripeEvent.Type)
             {
-                // Handle the events
-                case Events.CheckoutSessionCompleted:
-                {
-                    var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation(
-                        $"Checkout.Session ID: {checkoutSession!.Id}, Status: {checkoutSession.Status}");
-
-                    if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
+                case Events.CheckoutSessionCompleted or Events.CheckoutSessionAsyncPaymentSucceeded:
                     {
-                        try
-                        {
-                            var customerService = new CustomerService(_stripeClient);
-                            var customer = await customerService.GetAsync(checkoutSession.CustomerId);
+                        var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
+                        _logger.LogInformation("Checkout.Session ID: {Id}, Status: {CheckoutSessionStatus} PaymentStatus: {CheckoutSessionPaymentStatus}", checkoutSession!.Id, checkoutSession.Status, checkoutSession.PaymentStatus);
 
-                            var recipient = _messenger switch
+                        if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
+                        {
+                            var daprHttpClient = _httpClientFactory.CreateClient("dapr");
+                            var pubMessage = JsonSerializer.Serialize(new
                             {
-                                TwilioMessageSender => customer.Phone,
-                                SendGridMessageSender => customer.Email,
-                                _ => throw new ArgumentException("Unsupported Type")
-                            };
+                                StripeSessionID = checkoutSession.Id 
+                            });
+                            
+                            var content = new StringContent(pubMessage, Encoding.UTF8, "application/json");
+                            await daprHttpClient.PostAsync($"v1.0/publish/{PUBSUB_NAME}/fulfill.order", content);
+                        }
 
-                            await _messenger.SendMessageAsync("Your order has been successfully processed", recipient);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, ex.Message);
-                        }
+                        break;
                     }
-
-                    break;
-                }
                 case Events.CheckoutSessionExpired:
-                {
-                    var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}");
+                    {
+                        var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
+                        _logger.LogInformation("Checkout.Session ID: {Id}", checkoutSession!.Id);
 
-                    // Notify your customer about the cart
-                    break;
-                }
-                case Events.CheckoutSessionAsyncPaymentSucceeded:
-                {
-                    _logger.LogInformation("Deferred payment");
-                    break;
-                }
+                        // Notify your customer about the cart
+                        break;
+                    }
                 default:
                     _logger.LogInformation("Unhandled event type: {StripeEvent}", stripeEvent.Type);
                     break;
