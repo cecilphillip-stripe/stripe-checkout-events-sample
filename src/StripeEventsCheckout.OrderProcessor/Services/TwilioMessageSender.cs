@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Options;
-using StripeEventsCheckout.ApiServer.Models.Config;
 using Twilio.Clients;
 using Twilio.Rest.Api.V2010.Account;
 
-namespace StripeEventsCheckout.ApiServer.Services;
+namespace StripeEventsCheckout.OrderProcessor.Services;
 
 public class TwilioMessageSender : IMessageSender
 {

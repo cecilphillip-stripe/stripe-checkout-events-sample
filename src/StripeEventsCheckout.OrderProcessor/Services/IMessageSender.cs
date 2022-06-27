@@ -1,4 +1,4 @@
-namespace StripeEventsCheckout.ApiServer.Services;
+namespace StripeEventsCheckout.OrderProcessor.Services;
 
 public interface IMessageSender
 {
