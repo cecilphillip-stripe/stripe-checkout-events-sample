@@ -1,8 +1,10 @@
+using System.Text.Json;
 using CloudNative.CloudEvents;
 using Microsoft.AspNetCore.Mvc;
 using CloudNative.CloudEvents.AspNetCore;
 using CloudNative.CloudEvents.SystemTextJson;
 using Stripe;
+using Stripe.Checkout;
 using StripeEventsCheckout.OrderProcessor.Services;
 
 namespace StripeEventsCheckout.OrderProcessor.Controllers;
@@ -39,17 +41,23 @@ public class DaprController : ControllerBase
     {
         try
         {
-            CloudEvent cloudEvent = await this.Request.ToCloudEventAsync(_formatter);
+            var cloudEvent = await this.Request.ToCloudEventAsync(_formatter);
             _logger.LogDebug("Cloud event {CloudEventId} {CloudEventType} {CloudEventDataContentType}", cloudEvent.Id,
                 cloudEvent.Type, cloudEvent.DataContentType);
 
-            //cloudEvent.
-            //_logger.LogInformation("Order received...");
+            if (cloudEvent.Data is not JsonElement rawDataPayload) return BadRequest();
 
+            var dataPayload = rawDataPayload.Deserialize<CheckoutDataResponse>();
+            var sGetOptions = new SessionGetOptions
+            {
+                Expand = new List<string> {"customer"}
+            };
+            
+            var sessionService = new SessionService(_stripeClient);
+            var checkoutSession = await sessionService.GetAsync(dataPayload!.StripeSessionId, sGetOptions);
+            var customer = checkoutSession.Customer;
 
-            var customerService = new CustomerService(_stripeClient);
-            var customer = await customerService.GetAsync("checkoutSession.CustomerId");
-
+            _logger.LogInformation("Order received...");
             var recipient = _messenger switch
             {
                 TwilioMessageSender => customer.Phone,
@@ -63,7 +71,8 @@ public class DaprController : ControllerBase
         {
             _logger.LogError(ex, ex.Message);
         }
-
         return Ok();
     }
 }
+
+public record CheckoutDataResponse(string StripeSessionId);

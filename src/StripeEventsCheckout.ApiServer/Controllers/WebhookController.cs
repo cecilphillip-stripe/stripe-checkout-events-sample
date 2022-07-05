@@ -11,16 +11,14 @@ namespace StripeEventsCheckout.ApiServer.Controllers;
 [Route("[controller]")]
 public class WebhookController : ControllerBase
 {
-    private readonly IStripeClient _stripeClient;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<WebhookController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
     private const string PUBSUB_NAME = "rabbitmqbus";
 
-    public WebhookController(IStripeClient stripeClient, IHttpClientFactory httpClientFactory, ILogger<WebhookController> logger,
+    public WebhookController(IHttpClientFactory httpClientFactory, ILogger<WebhookController> logger,
         IOptions<StripeOptions> stripeConfig)
     {
-        _stripeClient = stripeClient;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _stripeConfig = stripeConfig;
@@ -51,7 +49,7 @@ public class WebhookController : ControllerBase
                             var daprHttpClient = _httpClientFactory.CreateClient("dapr");
                             var pubMessage = JsonSerializer.Serialize(new
                             {
-                                StripeSessionID = checkoutSession.Id 
+                                StripeSessionId = checkoutSession.Id 
                             });
                             
                             var content = new StringContent(pubMessage, Encoding.UTF8, "application/json");
