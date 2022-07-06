@@ -32,12 +32,22 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  ##### Redis #####
+  redis:    
+    image: "redis:7.0.2-alpine"
+    container_name: "redis_service"
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+ 
   ##### Zipkin #####
   zipkin:
     container_name: "zipkin_service"
     image: "openzipkin/zipkin:2.23.16"
     ports:
-      - 9411:9411
+      - "9411:9411"
 
   ##### Seq #####
   seq:
@@ -50,16 +60,6 @@ services:
     ports:
       - "8191:80"
 
-  ##### Seq Gelf ##### 
-  seq-input-gelf:
-    image: datalust/seq-input-gelf:latest
-    depends_on:
-      - seq
-    ports:
-      - "12201:12201/udp"
-    environment:
-      SEQ_ADDRESS: "http://seq:5341"
-    restart: unless-stopped
 networks:
   default:
     name: checkoutevents

@@ -6,7 +6,6 @@ services:
     build:
       context: ./src/
       dockerfile: ApiServer.Dockerfile
-    container_name: checkoutevents_server
     env_file:
       - .env
     ports:
