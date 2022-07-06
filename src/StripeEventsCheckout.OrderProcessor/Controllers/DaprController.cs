@@ -15,13 +15,15 @@ public class DaprController : ControllerBase
 {
     private readonly IStripeClient _stripeClient;
     private readonly IMessageSender _messenger;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<DaprController> _logger;
     private readonly CloudEventFormatter _formatter;
 
-    public DaprController(IStripeClient stripeClient, IMessageSender messenger, ILogger<DaprController> logger)
+    public DaprController(IStripeClient stripeClient, IMessageSender messenger, IConfiguration configuration, ILogger<DaprController> logger)
     {
         this._stripeClient = stripeClient;
         this._messenger = messenger;
+        this._configuration = configuration;
         this._logger = logger;
         this._formatter = new JsonEventFormatter();
     }
@@ -29,10 +31,18 @@ public class DaprController : ControllerBase
     [HttpGet("subscribe")]
     public ActionResult Subscribe()
     {
+        var pubSubConfig = _configuration.GetSection("DaprPubSub");
+        
         var payload = new[]
         {
-            new {pubsubname = "rabbitmqbus", topic = "fulfill.order", route = "fulfillment"}
+            new
+            {
+                pubsubname = pubSubConfig.GetValue<string>("Name"), 
+                topic = pubSubConfig.GetValue<string>("Topic"),
+                route = pubSubConfig.GetValue<string>("Route")
+            }
         };
+        
         return Ok(payload);
     }
 

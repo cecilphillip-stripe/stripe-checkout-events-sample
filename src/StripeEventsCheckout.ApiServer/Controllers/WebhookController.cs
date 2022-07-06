@@ -14,7 +14,6 @@ public class WebhookController : ControllerBase
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<WebhookController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
-    private const string PUBSUB_NAME = "rabbitmqbus";
 
     public WebhookController(IHttpClientFactory httpClientFactory, ILogger<WebhookController> logger,
         IOptions<StripeOptions> stripeConfig)
@@ -53,7 +52,7 @@ public class WebhookController : ControllerBase
                             });
                             
                             var content = new StringContent(pubMessage, Encoding.UTF8, "application/json");
-                            await daprHttpClient.PostAsync($"v1.0/publish/{PUBSUB_NAME}/fulfill.order", content);
+                            await daprHttpClient.PostAsync($"v1.0/publish/{_stripeConfig.Value.PubSubName}/fulfill.order", content);
                         }
 
                         break;
