@@ -20,6 +20,11 @@ if ! command -v az &> /dev/null && command -v docker &> /dev/null; then
     [ "$PS1" ] && return || exit; #exit script without closing shell
 fi
 
+if [ -f .env ]; then
+  printf "%s.env file found. Loading environment variables%s" "$GREEN" "$RESET"
+  export "$(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)"
+fi
+
 # register containerapp extension
 az extension add --name containerapp --upgrade
 az provider register --namespace Microsoft.App
