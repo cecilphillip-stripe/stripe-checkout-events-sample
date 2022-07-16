@@ -9,13 +9,13 @@ namespace StripeEventsCheckout.ApiServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WebhookController : ControllerBase
+public class WebhooksController : ControllerBase
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<WebhookController> _logger;
+    private readonly ILogger<WebhooksController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
 
-    public WebhookController(IHttpClientFactory httpClientFactory, ILogger<WebhookController> logger,
+    public WebhooksController(IHttpClientFactory httpClientFactory, ILogger<WebhooksController> logger,
         IOptions<StripeOptions> stripeConfig)
     {
         _httpClientFactory = httpClientFactory;
@@ -52,7 +52,8 @@ public class WebhookController : ControllerBase
                             });
                             
                             var content = new StringContent(pubMessage, Encoding.UTF8, "application/json");
-                            await daprHttpClient.PostAsync($"v1.0/publish/{_stripeConfig.Value.PubSubName}/fulfill.order", content);
+                            var publishResponse = await daprHttpClient.PostAsync($"v1.0/publish/{_stripeConfig.Value.PubSubName}/fulfill.order", content);
+                            _logger.LogInformation("Publish Response Success =>{Success} {StatusCode}",publishResponse.IsSuccessStatusCode, publishResponse.StatusCode);
                         }
 
                         break;
