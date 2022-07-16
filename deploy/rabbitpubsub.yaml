@@ -1,0 +1,8 @@
+componentType: pubsub.rabbitmq
+version: v1
+metadata:
+  - name: host
+    secretRef: host-connectionstring
+secrets:
+  - name: host-connectionstring
+    value: "<replace this with something>"

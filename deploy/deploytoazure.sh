@@ -16,7 +16,7 @@ ACR_NAME=stripeeventsdemo
 CONTAINER_APP_ENV=stripeeventsapp
 
 if ! command -v az &> /dev/null && command -v docker &> /dev/null; then
-    print "Both Docker and Azure CLI are needed to provision these resources"
+    printf "%sBoth Docker and Azure CLI are needed to provision these resources%s" "$RED" "$RESET"
     [ "$PS1" ] && return || exit; #exit script without closing shell
 fi
 
@@ -46,6 +46,10 @@ docker push $ACR_NAME.azurecr.io/eventsorderprocessor:latest
 # create containerapps environment
 print "%sCreate Container App Environment %s\n%s" "$BLUE" $CONTAINER_APP_ENV "$RESET"
 az containerapp env create --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP --location $REGION_LOCATION
+
+az containerapp env dapr-component set \
+    --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP \
+    --dapr-component-name rabbitmqbus --yaml rabbitpubsub.yaml
 
 printf "%sDeploy container app %s to %s\n%s" "$BLUE" "eventsorderprocessor" $CONTAINER_APP_ENV "$RESET"
 az containerapp create --name eventsorderprocessor --resource-group $RESOURCE_GROUP \
