@@ -13,6 +13,7 @@ RESET=$(tput sgr0)
 RESOURCE_GROUP=stripeeventsdemo
 REGION_LOCATION=eastus
 ACR_NAME=stripeeventsdemo
+LA_WORSKSPACE=stripeeventsdemo
 CONTAINER_APP_ENV=stripeeventsapp
 
 if ! command -v az &> /dev/null && command -v docker &> /dev/null; then
@@ -41,25 +42,36 @@ az acr login --name $ACR_NAME
 
 # build and publish images
 printf "%sBuild and push container image => %s.azurecr.io/eventsapp:latest\n%s" "$BLUE" $ACR_NAME "$RESET"
-docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ApiServer.Dockerfile .
+docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ../src/ApiServer.Dockerfile ../src/
 docker push $ACR_NAME.azurecr.io/eventsapp:latest
 
 printf "%sBuild and push container image => %s.azurecr.io/eventsorderprocessor:latest\n%s" "$BLUE" $ACR_NAME "$RESET"
-docker build --tag stripeeventsdemo.azurecr.io/eventsorderprocessor:latest -f OrderProcessor.Dockerfile .
+docker build --tag $ACR_NAME.azurecr.io/eventsorderprocessor:latest -f ../src/OrderProcessor.Dockerfile ../src/
 docker push $ACR_NAME.azurecr.io/eventsorderprocessor:latest
 
-# create containerapps environment
-print "%sCreate Container App Environment %s\n%s" "$BLUE" $CONTAINER_APP_ENV "$RESET"
-az containerapp env create --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP --location $REGION_LOCATION
+# create log analytics workspace
+printf "%sCreating log-analytics workspace => %s \n%s" "$BLUE" $LA_WORSKSPACE "$RESET"
+az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --location $REGION_LOCATION --workspace-name $LA_WORSKSPACE
+LA_SHAREDKEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $RESOURCE_GROUP --workspace-name $LA_WORSKSPACE --query primarySharedKey --output tsv)
+LA_WORSKSPACE_ID=$(az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LA_WORSKSPACE  -o tsv --query customerId)
 
+# create containerapps environment
+printf "%sCreate Container App Environment %s\n%s" "$BLUE" $CONTAINER_APP_ENV "$RESET"
+az containerapp env create --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP --location $REGION_LOCATION \
+--logs-workspace-id $LA_WORSKSPACE_ID --logs-workspace-key $LA_SHAREDKEY
+
+printf "%sAdd Rabbitmq DAPR component \n%s" "$BLUE" "$RESET"
 az containerapp env dapr-component set \
     --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP \
     --dapr-component-name rabbitmqbus --yaml rabbitpubsub.yaml
+
+ACR_PASSWORD=$(az acr credential show --name $ACR_NAME  --output tsv --query "passwords[0].value")
 
 printf "%sDeploy container app %s to %s\n%s" "$BLUE" "eventsorderprocessor" $CONTAINER_APP_ENV "$RESET"
 az containerapp create --name eventsorderprocessor --resource-group $RESOURCE_GROUP \
   --environment $CONTAINER_APP_ENV --image $ACR_NAME.azurecr.io/eventsorderprocessor \
   --target-port 5180 --ingress 'internal' --registry-server $ACR_NAME.azurecr.io \
+  --registry-username $ACR_NAME --registry-password $ACR_PASSWORD \
   --min-replicas 1 --max-replicas 5  --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container \
   --enable-dapr true --dapr-app-id orderproessor --dapr-app-port 5180 --dapr-app-protocol http
 
@@ -67,7 +79,13 @@ printf "%sDeploy container app %s to %s\n%s" "$BLUE" "eventsapp" $CONTAINER_APP_
 az containerapp create --name eventsapp --resource-group $RESOURCE_GROUP \
   --environment $CONTAINER_APP_ENV --image $ACR_NAME.azurecr.io/eventsapp \
   --target-port 5276 --ingress 'external' --registry-server $ACR_NAME.azurecr.io \
+  --registry-username $ACR_NAME --registry-password $ACR_PASSWORD \
   --min-replicas 1 --max-replicas 3 --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container \
   --enable-dapr true --dapr-app-id website --dapr-app-port 5276 --dapr-app-protocol http
 
 
+# Uncomment below to update container apps
+# printf "%sUpdating container app %s on %s\n%s" "$BLUE" "eventsorderprocessor" $CONTAINER_APP_ENV "$RESET"
+# az containerapp update -n eventsorderprocessor -g $RESOURCE_GROUP --image $ACR_NAME.azurecr.io/eventsorderprocessor:latest
+# printf "%sUpdating container app %s on %s\n%s" "$BLUE" "eventsapp" $CONTAINER_APP_ENV "$RESET"
+# az containerapp update -n eventsapp -g $RESOURCE_GROUP --image $ACR_NAME.azurecr.io/eventsapp:latest
