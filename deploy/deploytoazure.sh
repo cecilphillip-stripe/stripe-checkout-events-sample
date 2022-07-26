@@ -13,7 +13,7 @@ RESET=$(tput sgr0)
 RESOURCE_GROUP=StripeEventsDemo
 REGION_LOCATION=eastus
 ACR_NAME=stripeeventsdemo
-LA_WORSKSPACE=stripeeventsdemo
+LA_WORKSPACE=stripeeventsdemo
 CONTAINER_APP_ENV=stripeeventsapp
 
 if ! command -v az &> /dev/null && command -v docker &> /dev/null; then
@@ -28,6 +28,7 @@ fi
 
 # register containerapp extension
 az extension add --name containerapp --upgrade
+az extension add --name application-insights --upgrade
 az provider register --namespace Microsoft.App
 az provider register --namespace Microsoft.OperationalInsights
 
@@ -51,15 +52,22 @@ deploy () {
     docker push $ACR_NAME.azurecr.io/eventsorderprocessor:latest
     
     # create log analytics workspace
-    printf "%sCreating log-analytics workspace => %s \n%s" "$BLUE" $LA_WORSKSPACE "$RESET"
-    az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --location $REGION_LOCATION --workspace-name $LA_WORSKSPACE
-    LA_SHAREDKEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $RESOURCE_GROUP --workspace-name $LA_WORSKSPACE --query primarySharedKey --output tsv)
-    LA_WORSKSPACE_ID=$(az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LA_WORSKSPACE  -o tsv --query customerId)
+    printf "%sCreating log-analytics workspace => %s \n%s" "$BLUE" $LA_WORKSPACE "$RESET"
+    az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --location $REGION_LOCATION --workspace-name $LA_WORKSPACE
+    LA_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $RESOURCE_GROUP --workspace-name $LA_WORKSPACE --query primarySharedKey --output tsv)
+    LA_WORKSPACE_ID=$(az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LA_WORKSPACE  -o tsv --query customerId)
+    LA_WORKSPACE_RESOURCE_ID=$(az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LA_WORKSPACE  -o tsv --query id)
     
-    # create containerapps environment
+    # create applications insights resource
+    printf "%sCreating applications insights resource => %s \n%s" "$BLUE" $LA_WORKSPACE "$RESET"
+    az monitor app-insights component create --app $LA_WORKSPACE --location $REGION_LOCATION --kind web --resource-group $RESOURCE_GROUP \
+    --application-type web --workspace "$LA_WORKSPACE_RESOURCE_ID"
+     AI_INSTRUMENTATION_KEY=$(az monitor app-insights component show --app $LA_WORKSPACE --resource-group $RESOURCE_GROUP -o tsv --query instrumentationKey)
+    
+    # create container apps environment
     printf "%sCreate Container App Environment %s\n%s" "$BLUE" $CONTAINER_APP_ENV "$RESET"
     az containerapp env create --name $CONTAINER_APP_ENV --resource-group $RESOURCE_GROUP --location $REGION_LOCATION \
-    --logs-workspace-id $LA_WORSKSPACE_ID --logs-workspace-key $LA_SHAREDKEY
+    --logs-workspace-id "$LA_WORKSPACE_ID" --logs-workspace-key "$LA_SHARED_KEY"
     
     printf "%sAdding Rabbitmq DAPR component \n%s" "$BLUE" "$RESET"
     az containerapp env dapr-component set \
@@ -73,7 +81,8 @@ deploy () {
       --environment $CONTAINER_APP_ENV --image $ACR_NAME.azurecr.io/eventsorderprocessor \
       --target-port 5180 --ingress 'internal' --registry-server $ACR_NAME.azurecr.io \
       --registry-username $ACR_NAME --registry-password "$ACR_PASSWORD" \
-      --min-replicas 1 --max-replicas 5  --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container \
+      --min-replicas 1 --max-replicas 5  \
+      --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container APPINSIGHTS_INSTRUMENTATIONKEY="$AI_INSTRUMENTATION_KEY" \
       --enable-dapr true --dapr-app-id orderproessor --dapr-app-port 5180 --dapr-app-protocol http
     
     printf "%sDeploy container app %s to %s\n%s" "$BLUE" "eventsapp" $CONTAINER_APP_ENV "$RESET"
@@ -81,7 +90,8 @@ deploy () {
       --environment $CONTAINER_APP_ENV --image $ACR_NAME.azurecr.io/eventsapp \
       --target-port 5276 --ingress 'external' --registry-server $ACR_NAME.azurecr.io \
       --registry-username $ACR_NAME --registry-password "$ACR_PASSWORD" \
-      --min-replicas 1 --max-replicas 3 --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container \
+      --min-replicas 1 --max-replicas 3 \
+      --env-vars ASPNETCORE_ENVIRONMENT=Container DOTNET_ENVIRONMENT=Container APPINSIGHTS_INSTRUMENTATIONKEY="$AI_INSTRUMENTATION_KEY" \
       --enable-dapr true --dapr-app-id website --dapr-app-port 5276 --dapr-app-protocol http
 }
 
