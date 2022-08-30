@@ -48,6 +48,19 @@ services:
     image: "openzipkin/zipkin:2.23.16"
     ports:
       - "9411:9411"
+  
+  ##### otel collector #####
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    container_name: "collector_service"
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:   
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP http receiver
+      - "55679:55679" # zpages extension
 
   ##### Seq #####
   seq:

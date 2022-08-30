@@ -1,0 +1,38 @@
+# Reference
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+  zipkin:
+    endpoint: 0.0.0.0:9411
+    
+processors:
+  batch:
+    timeout: 2s
+
+extensions:
+  health_check:
+    path: "/health/status"
+  zpages:
+    endpoint: :55679
+
+exporters:
+  logging:
+    loglevel: info
+  zipkin:
+      endpoint: "http://zipkin_service:9411/api/v2/spans"
+  azuremonitor:
+    instrumentation_key: "f9e5b3a2-fe92-4173-8335-6b11cc8dbc64"
+  
+service:
+  extensions: [zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [zipkin, otlp]
+      exporters: [azuremonitor, zipkin,logging]
+    logs:
+      receivers: [ otlp ]
+      exporters: [ azuremonitor, logging ]
