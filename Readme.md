@@ -21,13 +21,14 @@ Before running the code, you'll need to retrieve your Stripe Secret Key from you
 * Under `Standard Keys`, reveal and copy your `Secret key`.
 
 > You can learn more about API Keys and Modes at this link => https://stripe.com/docs/keys
-* Copy and rename the `.env.sample` located in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) to a `.env` in the same directory.
-* Add your keys to the `.env` configuration file in the [StripeEventsCheckout.ApiServer](src/SimpleCheckoutServer) project.
+* Update the `appsettings.json` file located in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) with your Stripe Publishable Key and Secret Key
 
-```bash
-STRIPE__PUBLISHABLE_KEY=<YOUR_KEY>
-STRIPE__SECRET_KEY=<YOUR_KEY>
-STRIPE__WEBHOOK_SECRET=<YOUR_SECRET>
+```json
+"Stripe": {
+    "PublishableKey": "",
+    "SecretKey": "",
+    "WebhookSecrety": ""
+  },
 ```
 
 ### Step 2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
@@ -37,7 +38,7 @@ Use the `stripe listen` command with the `--forward-to` flag to stream stripe ev
 stripe listen --forward-to localhost:5276/webhook
 ```
 
-This command will return the webhook secret that you'll add to the `STRIPE__WEBHOOK_SECRET` configuration key in your `.env` file.
+This command will return the webhook secret that you'll add to the `WebhookSecret` configuration key in your `appsettings.json` file.
 
 
 ### Step 3: Seeding data into the Stripe Dashboard
@@ -49,13 +50,10 @@ Navigate into the src/ directory
 cd  src/
 ```
 
-Run the build. This will restore both the node and .NET packages.
-```shell
-dotnet build
-```
 Run the project
 ```shell
-dotnet run --project StripeEventsCheckout.ApiServer
+> dotnet build
+> dotnet run --project StripeEventsCheckout.ApiServer
 ```
 
 By default, the application should start running on http://localhost:5276

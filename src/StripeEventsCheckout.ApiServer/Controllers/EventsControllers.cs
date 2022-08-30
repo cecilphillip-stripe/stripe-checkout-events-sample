@@ -34,7 +34,7 @@ public class EventsController : ControllerBase
             price_id = p.Id,
             product_id = p.ProductId,
             name = p.Product.Name,
-            owner = p.Product.Metadata["owner"],
+            owner = p.Product.Metadata["ownerName"],
             unit_amount = p.UnitAmount,
             images = p.Product.Images
         });
@@ -52,8 +52,8 @@ public class EventsController : ControllerBase
             {
                 new SessionLineItemOptions
                 {
-                Price = payload.PriceId,
-                Quantity = payload.Quantity,
+                    Price = payload.PriceId,
+                    Quantity = payload.Quantity,
                 },
             },
             Mode = "payment",

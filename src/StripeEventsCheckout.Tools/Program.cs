@@ -14,8 +14,8 @@ using System.Reflection;
 
 DotNetEnv.Env.Load();
 
-var builder = BuildCommandLine();
-builder.UseHost(_ => Host.CreateDefaultBuilder(),
+var builder = BuildCommandLine()
+    .UseHost(_ => Host.CreateDefaultBuilder(),
                 host =>
                 {
                     host.ConfigureLogging(logbuilder =>
@@ -24,8 +24,7 @@ builder.UseHost(_ => Host.CreateDefaultBuilder(),
                     });
                     host.ConfigureServices(services =>
                     {
-                        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE__SECRET_KEY");
-
+                        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
                         var appInfo = new AppInfo
                         {
                             Name = "StripeEvents.Tools",
@@ -44,9 +43,9 @@ builder.UseHost(_ => Host.CreateDefaultBuilder(),
                             return new StripeClient(apiKey: StripeConfiguration.ApiKey, httpClient: httpClient);
                         });
                     });
-                });
+                })
+                .UseDefaults();
 
-builder.UseDefaults();
 var cmdparser = builder.Build();
 await cmdparser.InvokeAsync(args);
 
@@ -61,9 +60,13 @@ CommandLineBuilder BuildCommandLine()
 
     // Setup Command
     var setupCommand = new Command("setup");
-    setupCommand.Handler = CommandHandler.Create<IHost>(SetupHandler);
-    root.AddCommand(setupCommand);
+    setupCommand.Handler = CommandHandler.Create<SetupOptions, IHost>(SetupHandler);
+    var secretKeyOption = new Option<string>(
+        aliases: new[] { "--key", "-k" },
+        description: "Stripe Secret Key");
+    setupCommand.Add(secretKeyOption);
 
+    root.AddCommand(setupCommand);
     return new CommandLineBuilder(root);
 }
 
@@ -108,9 +111,15 @@ async Task StatusHandler(IHost host)
     }
 };
 
-async Task SetupHandler(IHost host)
+async Task SetupHandler(SetupOptions options, IHost host)
 {
     var stripeClient = host.Services.GetRequiredService<IStripeClient>();
+    if (string.IsNullOrEmpty(stripeClient.ApiKey) && string.IsNullOrEmpty(options.Key))
+    {
+        AnsiConsole.MarkupLine($"[red]Stripe Secret not set[/]");
+        return;
+    }
+
     var prodSvc = new ProductService(stripeClient);
     var priceSvc = new PriceService(stripeClient);
 
@@ -130,7 +139,9 @@ async Task SetupHandler(IHost host)
             }
         };
 
-        var newProduct = await prodSvc.CreateAsync(prodCreateOptions);
+        var newProduct = string.IsNullOrEmpty(options.Key) ?
+            await prodSvc.CreateAsync(prodCreateOptions) :
+            await prodSvc.CreateAsync(prodCreateOptions, new() { ApiKey = options.Key });
 
         var priceCreateOptions = new PriceCreateOptions
         {
@@ -144,12 +155,14 @@ async Task SetupHandler(IHost host)
             }
         };
 
-        var prodPrice = await priceSvc.CreateAsync(priceCreateOptions);
+        var prodPrice = string.IsNullOrEmpty(options.Key) ?
+            await priceSvc.CreateAsync(priceCreateOptions) :
+            await priceSvc.CreateAsync(priceCreateOptions, new() { ApiKey = options.Key });
 
         AnsiConsole.MarkupLine($"[Green]Created {newProduct.Name} - {newProduct.Id} - ${prodPrice.UnitAmount / 100m}[/] \n");
     }
 }
 
 public record StripeStatusResponse(StripeStatuses Statuses, string Largestatus, string Message, string Time);
-
 public record StripeStatuses(string Api, string Dashboard, string Stripejs, string Checkoutjs);
+public record SetupOptions(string Key);
