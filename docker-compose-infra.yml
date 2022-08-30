@@ -5,7 +5,7 @@ services:
   ##### MongoDB #####
   mongodb:
     container_name: mongodb
-    image: mongo:5.0.7
+    image: mongo:6.0.1
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
@@ -16,6 +16,22 @@ services:
       - ./tmp/mongo/data/db:/data/db
     ports:
       - "27017:27017"
+  
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: "27017"
+    ports:
+      - "8087:8081"
+    restart: unless-stopped
+    depends_on:
+      - mongodb
 
   ##### Seq #####
   seq:
