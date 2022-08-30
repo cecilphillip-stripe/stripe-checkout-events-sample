@@ -2,13 +2,13 @@
 
 ## What's in the box
 This sample is split into a few  projects
-* [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) - ASP.NET Core HTTP API backend that hosts endpoints for managing the checkout session and wehbooks
-* [StripeEventsCheckout.BlazorUI/](src/StripeEventsCheckout.BlazorUI/) - Frontend UI built with Blazor and Tailwind CSS.
-* [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) - .NET CLI tool for seeding Stripe product data
+* [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer) - ASP.NET Core HTTP API backend that hosts endpoints for managing the checkout session and wehbooks
+* [StripeEventsCheckout.BlazorUI/](src/StripeEventsCheckout.BlazorUI) - Frontend UI built with Blazor and Tailwind CSS.
+* [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools) - .NET CLI tool for seeding Stripe product data. (**Unneeded**. Kept just for reference)
 
 ## Requirements
 * .NET SDK 6.0+ 
-* A [Stripe Account](https://dashboard.stripe.com/register)
+* [Stripe Account](https://dashboard.stripe.com/register)
 * [Stripe CLI](https://stripe.com/docs/stripe-cli)
 
 
@@ -39,28 +39,9 @@ stripe listen --forward-to localhost:5276/webhook
 
 This command will return the webhook secret that you'll add to the `STRIPE__WEBHOOK_SECRET` configuration key in your `.env` file.
 
+
 ### Step 3: Seeding data into the Stripe Dashboard
-The [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools/) project contains the source for a .NET ClI tool (`dotnet-striped`) that you can use to load product data into your Stripe account. There are a few way you can run this tool
-
-The [nupkg](src/StripeEventsCheckout.Tools/nupkg/) contains the tool already bundled as a nuget package. To install and execute `dotnet-striped` as a [local tool](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use), run the follow commands from the `src/` directory.
-
-```shell
-> dotnet tool restore --add-source ./StripeEventsCheckout.Tools/nupkg
-> dotnet striped status
-```
-
-If the tool is installed correctly and the Stripe API is accessible, you should see "**All services are online.**" printed to the terminal.
-
-Next, populate the `STRIPE__SECRET_KEY` environment variable with your Stripe secret key. If you're using bash or zsh, the follow command will export the variables in your `.env` file to the current terminal session.
-
-```shell
-> set -o allexport; source .env; set +o allexport
-```
-
-To load the test data into your Stripe account, execute the following
-```shell
-> dotnet striped setup
-```
+The `appsettings.json` file has a configuration property called `SeedProductData`. Set it to `true` to initiate seeding product and pricing data.
 
 ### Step 4: Run the code 👨🏽‍💻
 Navigate into the src/ directory
@@ -79,8 +60,8 @@ dotnet run --project StripeEventsCheckout.ApiServer
 
 By default, the application should start running on http://localhost:5276
 
-### [**Optional**] Run the application in Docker 👨🏽‍💻
-The repo contains a Dockerfile and docker-compose files to quickly spin up the project running in containers on your local Docker instance.
+#### [**Optional**] Run the application in Docker 👨🏽‍💻
+The repo contains Dockerfiles and docker-compose files to quickly spin up the project running in containers on your local Docker instance.
 
 > To run the containers locally, you'll need to have [Docker](https://www.docker.com/products/personal/) installed on your machine.
 
@@ -89,11 +70,11 @@ The repo contains a Dockerfile and docker-compose files to quickly spin up the p
 * [docker-compose-app.yml](./docker-compose-app.yml) - Docker compose file to spin up the application.
 * [docker-compose-infra.yml](./docker-compose-infra.yml) - Docker compose file to spin up some additional services.
 
-| Service | Local Port(s) | 
-| :-------------- | :---------: | 
-| [Stripe Events Web App](src/StripeEventsCheckout.ApiServer/) |5276  |
-| [Mongo DB](https://www.mongodb.com/try/download/community) | 27017 |
-| [Seq](https://datalust.co/seq) | 8191 |
+| Service                                                     | Local Port(s) |
+|:------------------------------------------------------------|:-------------:|
+| [Stripe Events Web App](src/StripeEventsCheckout.ApiServer) |     5276      |
+| [Mongo DB](https://www.mongodb.com/try/download/community)  |     27017     |
+| [Seq](https://datalust.co/seq)                              |     8191      |
 
 **Run the containers**
 

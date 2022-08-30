@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.ApiSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.BlazorUI", "StripeEventsCheckout.BlazorUI\StripeEventsCheckout.BlazorUI.csproj", "{401F29EF-F1DB-4B49-9F58-BF055B81B27C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.Tools", "StripeEventsCheckout.Tools\StripeEventsCheckout.Tools.csproj", "{2D4D945B-7B5C-4999-A6EA-5E17A38A26CC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{401F29EF-F1DB-4B49-9F58-BF055B81B27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{401F29EF-F1DB-4B49-9F58-BF055B81B27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{401F29EF-F1DB-4B49-9F58-BF055B81B27C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D4D945B-7B5C-4999-A6EA-5E17A38A26CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D4D945B-7B5C-4999-A6EA-5E17A38A26CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D4D945B-7B5C-4999-A6EA-5E17A38A26CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D4D945B-7B5C-4999-A6EA-5E17A38A26CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
