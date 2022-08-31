@@ -43,6 +43,7 @@ services:
       - ./tmp/seq/data:/data
     ports:
       - "8191:80"
+      - "5341:5341"
 networks:
   default:
     name: checkoutevents
