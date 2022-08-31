@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using StripeEventsCheckout.ApiServer.Models;
-using StripeEventsCheckout.ApiServer.Models.Config;
+using StripeEventsCheckout.WebHost.Models;
+using StripeEventsCheckout.WebHost.Models.Config;
 
-namespace StripeEventsCheckout.ApiServer.Data;
+namespace StripeEventsCheckout.WebHost.Data;
 
 public class MongoDataStore : IEventListingDataStore
 {

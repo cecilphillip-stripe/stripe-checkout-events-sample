@@ -1,4 +1,4 @@
-namespace StripeEventsCheckout.ApiServer.Models.Config;
+namespace StripeEventsCheckout.WebHost.Models.Config;
 public class StripeOptions
 {
     public string PublishableKey { get; set; } = string.Empty;

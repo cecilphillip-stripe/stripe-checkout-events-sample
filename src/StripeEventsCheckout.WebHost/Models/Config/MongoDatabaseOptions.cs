@@ -1,4 +1,4 @@
-namespace StripeEventsCheckout.ApiServer.Models.Config;
+namespace StripeEventsCheckout.WebHost.Models.Config;
 public class MongoDatabaseOptions
 {
     public string? ConnectionString { get; set; }

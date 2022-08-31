@@ -1,8 +1,8 @@
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Stripe;
-using StripeEventsCheckout.ApiServer.Data;
-using StripeEventsCheckout.ApiServer.Models.Config;
+using StripeEventsCheckout.WebHost.Data;
+using StripeEventsCheckout.WebHost.Models.Config;
 using Twilio;
 using Twilio.Clients;
 

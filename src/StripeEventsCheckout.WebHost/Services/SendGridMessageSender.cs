@@ -1,7 +1,7 @@
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace StripeEventsCheckout.ApiServer.Services;
+namespace StripeEventsCheckout.WebHost.Services;
 
 public class SendGridMessageSender : IMessageSender
 {

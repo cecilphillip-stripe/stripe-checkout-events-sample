@@ -1,7 +1,7 @@
 using SendGrid.Extensions.DependencyInjection;
 using Serilog;
-using StripeEventsCheckout.ApiServer.Services;
-using StripeEventsCheckout.ApiServer.Workers;
+using StripeEventsCheckout.WebHost.Services;
+using StripeEventsCheckout.WebHost.Workers;
 
 DotNetEnv.Env.Load();
 

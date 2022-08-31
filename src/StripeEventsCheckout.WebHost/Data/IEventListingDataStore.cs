@@ -1,6 +1,6 @@
-using StripeEventsCheckout.ApiServer.Models;
+using StripeEventsCheckout.WebHost.Models;
 
-namespace StripeEventsCheckout.ApiServer.Data;
+namespace StripeEventsCheckout.WebHost.Data;
 
 public interface IEventListingDataStore
 {

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
-using StripeEventsCheckout.ApiServer.Models.Config;
-using StripeEventsCheckout.ApiServer.Services;
+using StripeEventsCheckout.WebHost.Models.Config;
+using StripeEventsCheckout.WebHost.Services;
 
-namespace StripeEventsCheckout.ApiServer.Controllers;
+namespace StripeEventsCheckout.WebHost.Controllers;
 
 [ApiController]
 [Route("[controller]")]

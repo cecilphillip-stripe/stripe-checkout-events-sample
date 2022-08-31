@@ -1,4 +1,4 @@
-namespace StripeEventsCheckout.ApiServer.Models;
+namespace StripeEventsCheckout.WebHost.Models;
 
 public class EventListing
 {

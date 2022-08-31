@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/StripeEventsCheckout.ApiServer/StripeEventsCheckout.ApiServer.csproj",
+                "${workspaceFolder}/src/StripeEventsCheckout.WebHost/StripeEventsCheckout.WebHost.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

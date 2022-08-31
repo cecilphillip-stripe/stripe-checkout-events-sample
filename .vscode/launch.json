@@ -2,14 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Launch API Server",
+            "name": ".NET Launch Web Host",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build API",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/StripeEventsCheckout.ApiServer/bin/Debug/net6.0/StripeEventsCheckout.ApiServer.dll",
+            "program": "${workspaceFolder}/src/StripeEventsCheckout.WebHost/bin/Debug/net6.0/StripeEventsCheckout.WebHost.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/StripeEventsCheckout.ApiServer",
+            "cwd": "${workspaceFolder}/src/StripeEventsCheckout.WebHost",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

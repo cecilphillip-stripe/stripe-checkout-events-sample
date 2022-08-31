@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
 
-namespace StripeEventsCheckout.ApiServer.Controllers;
+namespace StripeEventsCheckout.WebHost.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

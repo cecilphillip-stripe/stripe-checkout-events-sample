@@ -1,7 +1,7 @@
 using Spectre.Console;
 using Stripe;
 
-namespace StripeEventsCheckout.ApiServer.Workers;
+namespace StripeEventsCheckout.WebHost.Workers;
 
 public class SeederWorker : BackgroundService
 {

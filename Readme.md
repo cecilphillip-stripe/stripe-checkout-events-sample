@@ -2,7 +2,7 @@
 
 ## What's in the box
 This sample is split into a few  projects
-* [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer) - ASP.NET Core HTTP API backend that hosts endpoints for managing the checkout session and wehbooks
+* [StripeEventsCheckout.WebHost](src/StripeEventsCheckout.WebHost) - ASP.NET Core HTTP API backend that hosts endpoints for managing the checkout session and wehbooks
 * [StripeEventsCheckout.BlazorUI/](src/StripeEventsCheckout.BlazorUI) - Frontend UI built with Blazor and Tailwind CSS.
 * [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools) - .NET CLI tool for seeding Stripe product data. (**Unneeded**. Kept just for reference)
 
@@ -21,14 +21,24 @@ Before running the code, you'll need to retrieve your Stripe Secret Key from you
 * Under `Standard Keys`, reveal and copy your `Secret key`.
 
 > You can learn more about API Keys and Modes at this link => https://stripe.com/docs/keys
-* Update the `appsettings.json` file located in the root directory of [StripeEventsCheckout.ApiServer](src/StripeEventsCheckout.ApiServer/) with your Stripe Publishable Key and Secret Key
+* Update the `appsettings.json` file located in the root directory of [StripeEventsCheckout.WebHost](src/StripeEventsCheckout.WebHost) with your Stripe Publishable Key and Secret Key
 
 ```json
 "Stripe": {
-    "PublishableKey": "",
-    "SecretKey": "",
-    "WebhookSecrety": ""
-  },
+    "PublishableKey": "yourKey",
+    "SecretKey": "yourKey",
+    "WebhookSecrety": "yourSecret"
+  }
+
+```
+or copy and rename the [.env.sample](./src/StripeEventsCheckout.WebHost/.env.example) to `.env` and fill out the fields
+
+```dotenv
+# Stripe keys
+Stripe__PUublishableKey=yourKey
+Stripe__SecretKey=yourKey
+Stripe__WebhookSecret=yourSecret
+
 ```
 
 ### Step 2: Obtain your Stripe Webhook Key 🕵🏽‍♂️
@@ -53,7 +63,7 @@ cd  src/
 Run the project
 ```shell
 > dotnet build
-> dotnet run --project StripeEventsCheckout.ApiServer
+> dotnet run --project StripeEventsCheckout.WebHost
 ```
 
 By default, the application should start running on http://localhost:5276
@@ -64,13 +74,13 @@ The repo contains Dockerfiles and docker-compose files to quickly spin up the pr
 > To run the containers locally, you'll need to have [Docker](https://www.docker.com/products/personal/) installed on your machine.
 
 **File Listing**
-* [Dockerfile.ApiServer](./src/Dockerfile.ApiServer) - The Dockerfile definition to build the Blazor frontend and API Backend.
+* [Dockerfile.WebHost](./src/Dockerfile.WebHost) - The Dockerfile definition to build the Blazor frontend and API Backend.
 * [docker-compose-app.yml](./docker-compose-app.yml) - Docker compose file to spin up the application.
 * [docker-compose-infra.yml](./docker-compose-infra.yml) - Docker compose file to spin up some additional services.
 
 | Service                                                     | Local Port(s) |
 |:------------------------------------------------------------|:-------------:|
-| [Stripe Events Web App](src/StripeEventsCheckout.ApiServer) |     5276      |
+| [Stripe Events Web App](src/StripeEventsCheckout.WebHost) |     5276      |
 | [Mongo DB](https://www.mongodb.com/try/download/community)  |     27017     |
 | [Seq](https://datalust.co/seq)                              |     8191      |
 
