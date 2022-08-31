@@ -32,7 +32,7 @@ public class WebhookController : ControllerBase
         {
             var stripeEvent = EventUtility.ConstructEvent(payload,
                 Request.Headers["Stripe-Signature"],
-                _stripeConfig.Value.WebhookSecret
+                _stripeConfig.Value.WebhookSecret, throwOnApiVersionMismatch:false
             );
 
             _logger.LogInformation($"Webhook notification with type: {stripeEvent.Type} found for {stripeEvent.Id}");
@@ -43,20 +43,16 @@ public class WebhookController : ControllerBase
                 case Events.CheckoutSessionCompleted:
                 {
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation(
-                        $"Checkout.Session ID: {checkoutSession!.Id}, Status: {checkoutSession.Status}");
+                    _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}", checkoutSession!.Id, checkoutSession.Status);
 
                     if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
                     {
                         try
                         {
-                            var customerService = new CustomerService(_stripeClient);
-                            var customer = await customerService.GetAsync(checkoutSession.CustomerId);
-
                             var recipient = _messenger switch
                             {
-                                TwilioMessageSender => customer.Phone,
-                                SendGridMessageSender => customer.Email,
+                                TwilioMessageSender => checkoutSession.CustomerDetails.Phone,
+                                SendGridMessageSender => checkoutSession.CustomerDetails.Email,
                                 _ => throw new ArgumentException("Unsupported Type")
                             };
 

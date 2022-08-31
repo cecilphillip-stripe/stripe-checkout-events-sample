@@ -30,6 +30,6 @@ public class SendGridMessageSender : IMessageSender
         msg.AddTo(to);
 
         var emailResponse = await _sendGridClient.SendEmailAsync(msg);
-        _logger.LogInformation($"Email sent status => {emailResponse.StatusCode}");
+        _logger.LogInformation("Email sent status => {EmailResponseStatusCode}", emailResponse.StatusCode);
     }
 }
