@@ -1,0 +1,101 @@
+@page "/Signin"
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.ComponentModel.DataAnnotations
+@layout SlimLayout
+
+@inject IHttpClientFactory ClientFactory
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IToastService ToastNotifier
+@inject NavigationManager NavManager
+
+<PageTitle>Sign In</PageTitle>
+
+<div class="min-h-screen bg-white flex place-content-center">
+    <div class="w-1/2 pt-52">
+        <div class="mx-auto sm:max-w-sm">
+            <a href="/">
+                <img class="h-12 w-auto sm:h-5" src="" alt=""/>
+            </a>
+            <h2 class="mt-6 text-6xl font-extrabold text-gray-700">
+                Log in
+            </h2>
+        </div>
+
+        <div class="mt-8 sm:mx-auto sm:max-w-sm">
+            <div class="bg-white py-2 sm:rounded-lg">
+                <EditForm Model="@SignInData" OnSubmit="@HandleLoginSubmit" class="space-y-2">
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary />
+                    <div>
+                        <div class="mt-1">
+                            <InputText name="email" placeholder="Email" id="email" @bind-Value="SignInData.Email" 
+                                       class="appearance-none block w-full px-4 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-700 focus:border-gray-700 sm:text-sm"/>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="mt-1">
+                            <InputText name="password" type="password" placeholder="Password" @bind-Value="SignInData.Password"
+                                       class="appearance-none block w-full px-4 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-700 focus:border-gray-700 sm:text-sm"/>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" 
+                            class="text-md w-full flex justify-center mt-4 py-3 px-4 border-transparent rounded shadow font-medium text-white bg-blue-600 focus:outline-none hover:opacity-80">
+                            Log in (Local)
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+            <hr/>
+            <div>
+                <button
+                    type="submit"
+                    class="text-md w-full flex justify-center mt-4 py-3 px-4 border-transparent rounded shadow font-medium text-white bg-purple-700 focus:outline-none hover:opacity-80">
+                    Log in (Auth0)
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="w-1/2 bg-cover bg-center bg-no-repeat" style="background-image: url(https://cdn.evbstatic.com/s3-build/perm_001/0fff4c/django/images/login/lateral-image-2-hd.jpg);"></div>
+</div>
+
+@code {
+    private LoginFormModel SignInData = new();
+    
+    private async Task HandleLoginSubmit(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var client = ClientFactory.CreateClient("Base");
+            var resp = await client.PostAsJsonAsync("/api/security/AuthenticateJwt",
+                new  {SignInData.Email, SignInData.Password});
+
+            if (resp.IsSuccessStatusCode)
+            {
+                using var payload = await resp.Content.ReadFromJsonAsync<JsonDocument>();
+                var authToken = payload.RootElement.GetProperty("token").GetString();
+
+                await LocalStorage.SetItemAsync("authToken", authToken);
+                await AuthStateProvider.GetAuthenticationStateAsync();
+                NavManager.NavigateTo("/");
+            }
+            else
+            {
+                ToastNotifier.ShowError("Unable to validate credentials. Please try again", "Login failed");
+            }
+        }
+        
+        ToastNotifier.ShowInfo("Hi");
+    }
+
+    class LoginFormModel
+    {
+        [Required]
+        public string Email { get; set; }
+        
+        [Required]
+        public string Password { get; set; }
+    }
+}
