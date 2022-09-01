@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Stripe;
@@ -5,6 +8,8 @@ using StripeEventsCheckout.WebHost.Data;
 using StripeEventsCheckout.WebHost.Models.Config;
 using Twilio;
 using Twilio.Clients;
+
+namespace StripeEventsCheckout.WebHost.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -72,6 +77,29 @@ public static class ServiceCollectionExtensions
 
             return twilioRestClient;
         });
+        return services;
+    }
+
+    public static IServiceCollection AddAuthSetup(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddAuthentication(opt => 
+        { 
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+        }).AddJwtBearer(options =>
+        { 
+            options.TokenValidationParameters = new TokenValidationParameters 
+            { 
+                ValidateIssuer = true, 
+                ValidateAudience = true, 
+                ValidateIssuerSigningKey = true, 
+                ValidateLifetime = true, 
+                ValidIssuer = config["Issuer"], 
+                ValidAudience = config["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["SigningKey"])) 
+            }; 
+        });
+        
         return services;
     }
 }
