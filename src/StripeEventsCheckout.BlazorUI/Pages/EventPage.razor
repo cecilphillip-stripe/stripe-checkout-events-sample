@@ -4,7 +4,7 @@
 @inject IHttpClientFactory ClientFactory
 @inject ILogger<Index> Logger
 @inject ISessionStorageService SessionStorage
-@inject IToastService ToastService
+@inject IToastService ToastNotifier
 
 <PageTitle>Event Page</PageTitle>
 
@@ -169,6 +169,6 @@
         if (!string.IsNullOrEmpty(payload?.Url))
             NavManager.NavigateTo(payload.Url);
         else
-            ToastService.ShowError("Unable to create checkout session ⚠️");
+            ToastNotifier.ShowError("Unable to create checkout session ⚠️");
     }
 }

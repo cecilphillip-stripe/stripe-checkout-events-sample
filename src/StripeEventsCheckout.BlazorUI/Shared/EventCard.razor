@@ -34,6 +34,6 @@
 
 @code {
     [Parameter]
-    public EventInfo? Event {get;set;} = null;
-    public string EventPageRoute => $"event/{Event.StripeProductId}";   
+    public EventInfo? Event {get;set;}
+    private string EventPageRoute => $"event/{Event?.StripeProductId}";   
 }

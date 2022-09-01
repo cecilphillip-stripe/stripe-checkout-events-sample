@@ -1,5 +1,5 @@
 @page "/success"
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject ISessionStorageService SessionStorage
 
  <main>
         <div class="relative bg-white py-16 sm:py-24 lg:py-12">
@@ -57,12 +57,12 @@
     [Parameter]
     [SupplyParameterFromQuery(Name = "session_id")]
     public string? SessionId { get; set; }
-    
-    public EventInfo? CurrentEvent {get;set;}
+
+    private EventInfo? CurrentEvent {get;set;}
     
     protected override async Task OnInitializedAsync()
     {
-      CurrentEvent = await sessionStorage.GetItemAsync<EventInfo>("current_event");
-      await sessionStorage.RemoveItemAsync("current_event");
+      CurrentEvent = await SessionStorage.GetItemAsync<EventInfo>("current_event");
+      await SessionStorage.RemoveItemAsync("current_event");
     }
 }
