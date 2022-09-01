@@ -1,5 +1,6 @@
 using SendGrid.Extensions.DependencyInjection;
 using Serilog;
+using StripeEventsCheckout.WebHost.Extensions;
 using StripeEventsCheckout.WebHost.Services;
 using StripeEventsCheckout.WebHost.Workers;
 
@@ -15,6 +16,8 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("Stripe"));
 
+// Add auth services
+builder.Services.AddAuthSetup(builder.Configuration.GetSection("JWTSettings"));
 
 if ( builder.Configuration.GetValue<string>("NotifierService", "sendgrid").ToLower() == "twilio")
 {
@@ -49,6 +52,9 @@ if (app.Environment.IsDevelopment())
 app.UseBlazorFrameworkFiles();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
