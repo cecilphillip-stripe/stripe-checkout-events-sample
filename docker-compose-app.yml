@@ -10,7 +10,6 @@ services:
       - .env
     ports:
       - "5276:5276"
-    platform: linux/amd64
   
   website_dapr:
     image: "daprio/daprd:1.7.4"
@@ -34,7 +33,6 @@ services:
     env_file:
       - .env
   
-  
   ##### Order Processor #####
   orderprocessor:
     build:
@@ -44,7 +42,6 @@ services:
       - .env
     ports:
       - "5180:5180"
-    platform: linux/amd64
   
   orderprocessor_dapr:
     image: "daprio/daprd:1.7.4"
@@ -72,4 +69,3 @@ networks:
   default:
     name: checkoutevents
     external: true
-

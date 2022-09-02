@@ -43,11 +43,11 @@ deploy () {
     
     # build and publish images
     printf "%sBuild and push container image => %s.azurecr.io/eventsapp:latest\n%s" "$BLUE" $ACR_NAME "$RESET"
-    docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ../src/ApiServer.Dockerfile ../src/
+    docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ../src/ApiServer.Dockerfile --platform linux/amd64 ../src/
     docker push $ACR_NAME.azurecr.io/eventsapp:latest
     
     printf "%sBuild and push container image => %s.azurecr.io/eventsorderprocessor:latest\n%s" "$BLUE" $ACR_NAME "$RESET"
-    docker build --tag $ACR_NAME.azurecr.io/eventsorderprocessor:latest -f ../src/OrderProcessor.Dockerfile ../src/
+    docker build --tag $ACR_NAME.azurecr.io/eventsorderprocessor:latest -f ../src/OrderProcessor.Dockerfile --platform linux/amd64 ../src/
     docker push $ACR_NAME.azurecr.io/eventsorderprocessor:latest
     
     # create log analytics workspace
@@ -88,11 +88,11 @@ deploy () {
 update_containers() {    
     # build and publish images
     printf "%sBuild and push container image => %s.azurecr.io/eventsapp:latest \n%s" "$BLUE" $ACR_NAME "$RESET"
-    docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ../src/ApiServer.Dockerfile ../src/
+    docker build --tag $ACR_NAME.azurecr.io/eventsapp:latest -f ../src/ApiServer.Dockerfile --platform linux/amd64 ../src/
     docker push $ACR_NAME.azurecr.io/eventsapp:latest
     
     printf "%sBuild and push container image => %s.azurecr.io/eventsorderprocessor:latest \n%s" "$BLUE" $ACR_NAME "$RESET"
-    docker build --tag $ACR_NAME.azurecr.io/eventsorderprocessor:latest -f ../src/OrderProcessor.Dockerfile ../src/
+    docker build --tag $ACR_NAME.azurecr.io/eventsorderprocessor:latest -f ../src/OrderProcessor.Dockerfile --platform linux/amd64 ../src/
     docker push $ACR_NAME.azurecr.io/eventsorderprocessor:latest
     
     # Uncomment below to update container apps
