@@ -1,0 +1,72 @@
+[
+  {
+    "id": "SEC-18432",
+    "firstName": "Juston",
+    "lastName": "Cormier",
+    "userName": "juston48",
+    "phoneNumber": "(953) 597-0708",
+    "email": "juston.cormier@hotmail.com",
+    "country": "Kenya",
+    "roles": [
+      "customer",
+      "vendor",
+      "promoter"
+    ]
+  },
+  {
+    "id": "SEC-14079",
+    "firstName": "Ludie",
+    "lastName": "Schaden",
+    "userName": "ludie.schaden62",
+    "phoneNumber": "(531) 553-3015",
+    "email": "ludie.schaden16@hotmail.com",
+    "country": "Aruba",
+    "roles": [
+      "promoter",
+      "host",
+      "vendor"
+    ]
+  },
+  {
+    "id": "SEC-12618",
+    "firstName": "Rosina",
+    "lastName": "Kunde",
+    "userName": "rosina_kunde97",
+    "phoneNumber": "(658) 285-6580",
+    "email": "rosina19@hotmail.com",
+    "country": "Serbia",
+    "roles": [
+      "promoter",
+      "customer",
+      "vendor"
+    ]
+  },
+  {
+    "id": "SEC-49608",
+    "firstName": "Isabell",
+    "lastName": "Feeney",
+    "userName": "isabell.feeney",
+    "phoneNumber": "(436) 901-9259",
+    "email": "isabell.feeney@yahoo.com",
+    "country": "Egypt",
+    "roles": [
+      "host",
+      "customer",
+      "vendor"
+    ]
+  },
+  {
+    "id": "SEC-68794",
+    "firstName": "Webster",
+    "lastName": "Sanford",
+    "userName": "webster_sanford",
+    "phoneNumber": "(959) 519-9114",
+    "email": "webster46@hotmail.com",
+    "country": "Mauritania",
+    "roles": [
+      "host",
+      "customer",
+      "vendor"
+    ]
+  }
+]
