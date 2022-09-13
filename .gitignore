@@ -192,3 +192,5 @@ OpenCover/
 node_modules/
 tmp/
 .env
+
+**/StripeEventsCheckout.IdentityServer/keys
