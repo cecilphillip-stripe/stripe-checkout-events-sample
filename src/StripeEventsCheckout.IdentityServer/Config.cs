@@ -11,19 +11,13 @@ public static class Config
             new IdentityResources.Profile()
         };
 
-    // public static IEnumerable<ApiScope> ApiScopes =>
-    //     new ApiScope[]
-    //     {
-    //         new ApiScope("api", new[] { "name" })
-    //     };
-
     public static IEnumerable<Client> Clients =>
         new Client[]
         {
             new Client
             {
                 ClientId = "stripe.events.web",
-                ClientSecrets = { new Secret("morphes".Sha256()) },
+                ClientSecrets = { new Secret("morpheus".Sha256()) },
                   
                 AllowOfflineAccess = true,
                 AllowedScopes = { "openid", "profile" },
