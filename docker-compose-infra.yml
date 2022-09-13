@@ -12,6 +12,7 @@ services:
       - MONGO_INITDB_DATABASE=eventsshop
     volumes:
       - ./demo_data/listings.json:/data/listings.json
+      - ./demo_data/customers.json:/data/customers.json
       - ./demo_data/populate.sh:/docker-entrypoint-initdb.d/populate.sh
       - ./tmp/mongo/data/db:/data/db
     ports:

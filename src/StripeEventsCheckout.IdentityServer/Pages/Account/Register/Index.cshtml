@@ -1,0 +1,41 @@
+@page
+@model StripeEventsCheckout.IdentityServer.Pages.Account.Register.Index
+
+<div class="login-page">
+    <partial name="_ValidationSummary"/>
+
+    <div class="row">
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Register new Customer account</h2>
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+                        <div class="form-group">
+                            <label asp-for="Input.FirstName"></label>
+                            <input class="form-control" placeholder="First Name" asp-for="Input.FirstName" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.LastName"></label>
+                            <input class="form-control" placeholder="Last Name" asp-for="Input.LastName" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Email"></label>
+                            <input class="form-control" type="email" placeholder="Email" asp-for="Input.Email" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Username"></label>
+                            <input class="form-control" placeholder="Username" asp-for="Input.Username" autofocus>
+                        </div>
+
+                        <button class="btn btn-primary" name="Input.Button" value="register">Register Customer</button>
+                        <button class="btn btn-secondary" name="Input.Button" value="cancel">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
