@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.CookiePolicy;
 using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using StripeEventsCheckout.WebHost.Extensions;
@@ -17,14 +18,15 @@ builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("Stripe"));
 
 // Add auth services
-builder.Services.AddAuthSetup(builder.Configuration.GetSection("JWTSettings"));
+builder.Services.AddAuthSetup(builder.Configuration);
 
-if ( builder.Configuration.GetValue<string>("NotifierService", "sendgrid").ToLower() == "twilio")
+var notifyBy = builder.Configuration.GetValue<string>("NotifierService");
+if ( notifyBy.Equals("twilio", StringComparison.InvariantCultureIgnoreCase))
 {
     builder.Services.AddTwilio(builder.Configuration.GetSection("Twilio"));
     builder.Services.AddTransient<IMessageSender, TwilioMessageSender>();
 }
-else
+else if( notifyBy.Equals("sendgrid", StringComparison.InvariantCultureIgnoreCase))
 {
     builder.Services.AddSendGrid(options =>
     {
@@ -32,6 +34,16 @@ else
     });
     builder.Services.AddTransient<IMessageSender, SendGridMessageSender>();
 }
+else
+{
+    //TODO: No Op?
+}
+
+builder.Services.Configure<CookiePolicyOptions>(options => {
+    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+    options.HttpOnly = HttpOnlyPolicy.Always;
+    options.Secure = CookieSecurePolicy.Always;
+});
 
 builder.Services.AddControllers();
 
@@ -49,13 +61,18 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
 }
 
+app.UseHttpsRedirection();
+app.UseCookiePolicy();
+
 app.UseBlazorFrameworkFiles();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseAuthentication();
+app.UseBff();
 app.UseAuthorization();
 
+app.MapBffManagementEndpoints();
 app.MapControllers();
 
 app.MapFallbackToFile("index.html");

@@ -1,5 +1,7 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -48,10 +50,10 @@ public static class ServiceCollectionExtensions
         {
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var httpClient = new SystemNetHttpClient(
-               httpClient: clientFactory.CreateClient("Stripe"),
-               maxNetworkRetries: StripeConfiguration.MaxNetworkRetries,
-               appInfo: appInfo,
-               enableTelemetry: StripeConfiguration.EnableTelemetry);
+                httpClient: clientFactory.CreateClient("Stripe"),
+                maxNetworkRetries: StripeConfiguration.MaxNetworkRetries,
+                appInfo: appInfo,
+                enableTelemetry: StripeConfiguration.EnableTelemetry);
 
             return new StripeClient(apiKey: StripeConfiguration.ApiKey, httpClient: httpClient);
         });
@@ -71,7 +73,7 @@ public static class ServiceCollectionExtensions
         {
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var twilioRestClient = new TwilioRestClient(accountSid, authToken,
-                     httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
+                httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
 
             TwilioClient.SetRestClient(twilioRestClient);
 
@@ -82,24 +84,39 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddAuthSetup(this IServiceCollection services, IConfiguration config)
     {
-        services.AddAuthentication(opt => 
-        { 
-            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
-            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
-        }).AddJwtBearer(options =>
-        { 
-            options.TokenValidationParameters = new TokenValidationParameters 
-            { 
-                ValidateIssuer = true, 
-                ValidateAudience = true, 
-                ValidateIssuerSigningKey = true, 
-                ValidateLifetime = true, 
-                ValidIssuer = config["Issuer"], 
-                ValidAudience = config["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["SigningKey"])) 
-            }; 
-        });
-        
+        services.AddBff();
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultSignOutScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "__Host-blazor";
+                options.Cookie.SameSite = SameSiteMode.Strict;
+            }).AddOpenIdConnect( options =>
+            {
+                var openIdSettings = config.GetSection("OpenIdConnect");
+                options.Authority = openIdSettings.GetValue<string>("Authority");
+                
+                // confidential client using code flow + PKCE
+                options.ClientId = openIdSettings.GetValue<string>("ClientId");
+                options.ClientSecret = openIdSettings.GetValue<string>("ClientSecret");
+                options.ResponseType = "code";
+                options.ResponseMode = "query";
+
+                options.MapInboundClaims = false;
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.SaveTokens = true;
+
+                // request scopes + refresh tokens
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+                options.Scope.Add("offline_access");
+            });
+
         return services;
     }
 }
