@@ -1,7 +1,6 @@
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using StripeEventsCheckout.IdentityServer.Pages.Logout;
 
 namespace StripeEventsCheckout.IdentityServer.Pages.Account.Logout;
 

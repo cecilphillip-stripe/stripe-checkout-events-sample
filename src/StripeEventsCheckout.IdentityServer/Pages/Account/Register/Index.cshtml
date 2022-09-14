@@ -30,6 +30,11 @@
                             <label asp-for="Input.Username"></label>
                             <input class="form-control" placeholder="Username" asp-for="Input.Username" autofocus>
                         </div>
+                        <div class="form-group">
+                            <label asp-for="Input.CreateStripeCustomer"></label>
+                            <input asp-for="Input.CreateStripeCustomer">
+                        </div>
+
 
                         <button class="btn btn-primary" name="Input.Button" value="register">Register Customer</button>
                         <button class="btn btn-secondary" name="Input.Button" value="cancel">Cancel</button>

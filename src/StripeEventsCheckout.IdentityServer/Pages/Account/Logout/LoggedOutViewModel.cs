@@ -2,7 +2,7 @@
 // See LICENSE in the project root for license information.
 
 
-namespace StripeEventsCheckout.IdentityServer.Pages.Logout;
+namespace StripeEventsCheckout.IdentityServer.Pages.Account.Logout;
 
 public class LoggedOutViewModel
 {

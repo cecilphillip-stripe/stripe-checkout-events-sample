@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace StripeEventsCheckout.IdentityServer.Pages.Logout;
+namespace StripeEventsCheckout.IdentityServer.Pages.Account.Logout;
 
 [SecurityHeaders]
 [AllowAnonymous]

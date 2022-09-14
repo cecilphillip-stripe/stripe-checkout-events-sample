@@ -2,11 +2,7 @@
 @model StripeEventsCheckout.IdentityServer.Pages.Account.Login.Index
 
 <div class="login-page">
-    <div class="lead">
-        <h1>Login</h1>
-        <p>Choose how to login</p>
-    </div>
-
+    
     <partial name="_ValidationSummary"/>
 
     <div class="row">
@@ -47,6 +43,16 @@
                             <button class="btn btn-primary" name="Input.Button" value="login">Login</button>
                             <button class="btn btn-secondary" name="Input.Button" value="cancel">Cancel</button>
                         </form>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header text-white bg-primary">
+                        <h2>No Account??</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <a class="btn btn-primary" asp-page="/Account/Register/Index">Register</a>
                     </div>
                 </div>
             </div>
