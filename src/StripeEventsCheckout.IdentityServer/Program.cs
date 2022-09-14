@@ -1,6 +1,7 @@
 ﻿using StripeEventsCheckout.IdentityServer;
 using Serilog;
 
+DotNetEnv.Env.Load();
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();

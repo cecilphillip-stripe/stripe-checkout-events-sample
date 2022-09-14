@@ -38,6 +38,11 @@ public class CustomerProfileService: IProfileService
                 };
 
                 claims.AddRange(customer.Roles.Select(role => new Claim(JwtClaimTypes.Role, role)));
+                if (!string.IsNullOrEmpty(customer.StripeCustomerId))
+                {
+                    claims.Add(new("stripe_customer",customer.StripeCustomerId ));
+                }
+
                 context.AddRequestedClaims(claims);
             }
         }

@@ -51,6 +51,15 @@ public class MongoDataStore : ICustomerDataStore
         await collection.InsertOneAsync(newCustomer);
     }
 
+    public async Task<bool> SetStripeCustomerInfo(string customerId, string stripeCustomerId)
+    {
+        var collection = _database.GetCollection<Customer>(_mongodbSettings.CustomersCollectionName);
+        var filter = Builders<Customer>.Filter.Eq(c => c.CustomerId, customerId );
+        var update = Builders<Customer>.Update.Set(c => c.StripeCustomerId, stripeCustomerId);
+        var updateResult= await collection.UpdateOneAsync(filter, update);
+        return updateResult.IsAcknowledged && updateResult.ModifiedCount == 1;
+    }
+
     public async Task<bool> DeleteCustomerByUsername(string username)
     {
         var collection = _database.GetCollection<Customer>(_mongodbSettings.CustomersCollectionName);

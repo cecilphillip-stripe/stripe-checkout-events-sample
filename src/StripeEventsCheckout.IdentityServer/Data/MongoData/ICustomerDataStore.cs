@@ -5,8 +5,9 @@ public interface ICustomerDataStore
     Task<Customer> GetCustomerByUsername(string username);
     Task<Customer> GetCustomerById(string id);
 
-    Task CreateCustomer(Customer newCustomer); 
-    
+    Task CreateCustomer(Customer newCustomer);
+
+    Task<bool> SetStripeCustomerInfo(string customerId, string stripeCustomerId);
     Task<bool> DeleteCustomerByUsername(string username);
     Task<bool> DeleteCustomerById(string id);
 }
