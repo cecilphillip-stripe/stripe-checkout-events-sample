@@ -13,28 +13,30 @@
                         </button>
                     </div>
                 </div>
-                <div class="md:flex md:ml-6 w-2/4">
+                @*                <div class="md:flex md:ml-6 w-2/4">
 
                     <input type="search" placeholder="Search Events" class="
                             inline-flex items-center w-full px-3 text-base                            
                             text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300                            
                             m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"/>
-
                 </div>
+            *@
             </div>
-            <AuthorieView>
-                <NotAuthorized>
-                    <div class="hidden md:flex md:items-center md:space-x-6 text-gray-500 text-sm font-semibold">
-                        <NavLink href="/Signin" class="cursor-pointer inline-flex items-center py-2">
+            <div class="hidden md:flex md:items-center md:space-x-6 text-gray-500 text-sm font-semibold">
+                <NavLink class="cursor-pointer inline-flex items-center py-2" href="/">Subscribe</NavLink>
+                <AuthorizeView>
+                    <NotAuthorized>
+                        <NavLink href="bff/login" class="cursor-pointer inline-flex items-center py-2">
                             Sign in
                         </NavLink>
-                    </div>
-                </NotAuthorized>
-                <Authorized>
-                    
-                </Authorized>
-
-            </AuthorieView>
+                    </NotAuthorized>
+                    <Authorized>
+                        <NavLink class="cursor-pointer inline-flex items-center py-2" href="@context.User.FindFirst("bff:logout_url")?.Value">
+                            Log out
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
         </nav>
     </div>
 </header>

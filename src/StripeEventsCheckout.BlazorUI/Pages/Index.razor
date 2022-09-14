@@ -17,14 +17,9 @@
             </p>
         </div>
         <div class="mt-12 mx-auto max-w-md px-4 grid gap-8 sm:max-w-lg sm:px-6 lg:grid-cols-4 lg:max-w-7xl">
-            @if(Events == null) {
-                <div>Nothing to see here</div>
-            } else {
-                @foreach(var evt in Events) {
+            @foreach(var evt in Events) {
                     <EventCard Event="evt" />
                 }
-            }
-            
         </div>
     </div>
 </div>
@@ -34,7 +29,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var client = ClientFactory.CreateClient("Base");
-        Events = await client.GetFromJsonAsync<IEnumerable<EventInfo>>("/api/events/available") ?? Array.Empty<EventInfo>();
+        var client = ClientFactory.CreateClient("backend");
+        try
+        {
+            var resp = await client.GetAsync("/api/events/available");
+            if (resp.IsSuccessStatusCode)
+            {
+                var payload = await resp.Content.ReadFromJsonAsync<IEnumerable<EventInfo>>() ?? Array.Empty<EventInfo>();
+                Events = payload;
+            }
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex, "Oh oh... that's not good!");
+        }
     }
 }

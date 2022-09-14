@@ -15,10 +15,13 @@ builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 
-builder.Services.AddHttpClient("Base", client =>
-    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-
+// authentication state and authorization
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, LocalStorageTokenAuthProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, BffAuthenticationStateProvider>();
+
+// HTTP client configuration
+builder.Services.AddTransient<AntiForgeryHandler>();
+builder.Services.AddHttpClient("backend", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddHttpMessageHandler<AntiForgeryHandler>();
 
 await builder.Build().RunAsync();
