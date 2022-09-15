@@ -4,7 +4,7 @@
 <div class="login-page">
     
     <partial name="_ValidationSummary"/>
-
+ 
     <div class="row">
 
         @if (Model.View.EnableLocalLogin)
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="card-body">
-                        <a class="btn btn-primary" asp-page="/Account/Register/Index">Register</a>
+                        <a class="btn btn-primary" asp-route-returnUrl="@Model.Input.ReturnUrl"  asp-page="/Account/Register/Index">Register</a>
                     </div>
                 </div>
             </div>

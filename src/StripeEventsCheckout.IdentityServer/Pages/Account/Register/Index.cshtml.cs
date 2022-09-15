@@ -22,34 +22,50 @@ public class Index : PageModel
     
     [BindProperty] public InputModel Input { get; set; } = new();
 
-    public async Task<IActionResult> OnPost()
+    public IActionResult OnGet(string returnUrl = null)
     {
-        //TODO: check form validation
-        if (Input.Button == "cancel")
-        {
-            Input = new();
-        }
-        else if (Input.Button == "register")
-        {
-            var customer = new Customer
-            {
-               FirstName = Input.FirstName,
-               LastName = Input.LastName,
-               Email = Input.Email,
-               UserName = Input.Username,
-               IsActive = true,
-               Roles = new []{"customer"}
-            };
-            
-            await _dataStore.CreateCustomer(customer);
+        Input.ReturnUrl = returnUrl;
+        return Page();
+    }
 
-            if (Input.CreateStripeCustomer)
+    public async Task<IActionResult> OnPost(string returnUrl = null)
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        Input.ReturnUrl = returnUrl;
+        switch (Input.Button)
+        {
+            case "cancel":
+                Input = new();
+                break;
+
+            case "register":
             {
-               await  _notifier.CreateStripeAccountWriter.WriteAsync(customer);
+                var customer = new Customer
+                {
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    Email = Input.Email,
+                    UserName = Input.Username,
+                    IsActive = true,
+                    Roles = new[] { "customer" }
+                };
+
+                await _dataStore.CreateCustomer(customer);
+
+                if (Input.CreateStripeCustomer)
+                {
+                    await _notifier.CreateStripeAccountWriter.WriteAsync(customer);
+                }
+
+                break;
             }
         }
 
-        return Redirect("~/");
+        return RedirectToPage("/Account/Login/Index", new { returnUrl = Input.ReturnUrl });
     }
 }
 
@@ -64,4 +80,5 @@ public class InputModel
     [Required] public bool CreateStripeCustomer { get; set; }
 
     public string Button { get; set; }
+    public string ReturnUrl { get; set; }
 }
