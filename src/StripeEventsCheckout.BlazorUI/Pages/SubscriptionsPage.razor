@@ -1,0 +1,45 @@
+@page "/subscriptions"
+
+@implements IAsyncDisposable
+@inject IJSRuntime JScript
+
+<PageTitle>Subscriptions</PageTitle>
+
+<div class="flex-grow relative bg-white py-16 sm:py-24 lg:py-16">
+    <div class="relative">
+        <div class="text-center mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl">
+            <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                Event Membership Subscriptions
+            </p>
+            <p class="mt-5 mx-auto max-w-prose text-xl text-gray-500">
+                Can't get enourge of our events? Already thinking about your next adventure before your current one is
+                even finished? Sign up now for one of our mempership subsciptions.
+            </p>
+        </div>
+        <div class="mt-12 mx-auto max-w-md px-4 grid gap-8 sm:max-w-lg sm:px-6 lg:grid-cols-none lg:max-w-7xl">
+            <stripe-pricing-table pricing-table-id="prctbl_1LiOcxDOsKcaw7hQVNpb0k3a"
+                                  publishable-key="pk_test_51KgV6PDOsKcaw7hQwqDJzU3Gc8mgbmn47ueVpaqqnLkWVGCF2ZbtIbzdm2snZjivVwSsgLE6DxVwDEXFPOATGyGU00oRyTB4O2">
+            </stripe-pricing-table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IJSObjectReference? _module;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JScript.InvokeAsync<IJSObjectReference>("import", 
+                "./scripts/stripe-pricingTable-loader.js");
+            
+            await _module.InvokeAsync<string>("loadPricingTableScript");
+        }
+    }
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (_module is not null)
+            await _module.DisposeAsync();
+    }
+}

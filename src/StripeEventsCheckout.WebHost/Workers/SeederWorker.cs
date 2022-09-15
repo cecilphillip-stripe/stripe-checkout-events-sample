@@ -13,6 +13,7 @@ public class SeederWorker : BackgroundService
         _stripeClient = stripeClient;
         _logger = logger;
     }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var prodSvc = new ProductService(_stripeClient);
@@ -22,8 +23,9 @@ public class SeederWorker : BackgroundService
             _logger.LogInformation("Started Data Seeding...");
             var priceSvc = new PriceService(_stripeClient);
 
-            var data = DemoData.Retrieve();
-            foreach (var item in data)
+            // Add one-time payment products
+            var products = DemoData.RetrieveProducts();
+            foreach (var item in products)
             {
                 AnsiConsole.MarkupLine($"[blue]Creating Product {item.Product.Name} - ${item.Product.Price / 100d}[/]");
                 var prodCreateOptions = new ProductCreateOptions
@@ -32,12 +34,12 @@ public class SeederWorker : BackgroundService
                     Images = new List<string> { item.Product.Image },
                     Metadata = new Dictionary<string, string>
                     {
-                        ["owner"] = item.Email,
+                        ["owner"] = $"{item.FirstName} {item.LastName}",
                         ["ownerName"] = item.Company
                     }
                 };
 
-                var newProduct = await prodSvc.CreateAsync(prodCreateOptions);
+                var newProduct = await prodSvc.CreateAsync(prodCreateOptions, cancellationToken: stoppingToken);
 
                 var priceCreateOptions = new PriceCreateOptions
                 {
@@ -51,10 +53,52 @@ public class SeederWorker : BackgroundService
                     }
                 };
 
-                var prodPrice = await priceSvc.CreateAsync(priceCreateOptions);
-                AnsiConsole.MarkupLine($"[Green]Created {newProduct.Name} - {newProduct.Id} - ${prodPrice.UnitAmount / 100m}[/] \n");
+                var prodPrice = await priceSvc.CreateAsync(priceCreateOptions, cancellationToken: stoppingToken);
+                AnsiConsole.MarkupLine(
+                    $"[Green]Created {newProduct.Name} - {newProduct.Id} - ${prodPrice.UnitAmount / 100m}[/] \n");
             }
 
+            // Add subscription based products
+            _logger.LogInformation("Creating subscriptions...");
+            var subscriptions = DemoData.RetrieveSubscriptions();
+            foreach (var sub in subscriptions)
+            {
+                AnsiConsole.MarkupLine($"[blue]Creating Subscription Product {sub.Name} [/]");
+                var prodCreateOptions = new ProductCreateOptions
+                {
+                    Name = sub.Name,
+                    Images = new List<string> { sub.Image },
+                    Metadata = new Dictionary<string, string>
+                    {
+                        ["owner"] = "C.L.P",
+                        ["ownerName"] = "Cecil's Event Experiences"
+                    }
+                };
+
+                var newProduct = await prodSvc.CreateAsync(prodCreateOptions, cancellationToken: stoppingToken);
+                
+                // Create monthly and yearly subscriptions. Expects 2 prices per product
+                for (var i = 0; i < sub.Prices.Length; i++)
+                {
+                    var priceCreateOptions = new PriceCreateOptions
+                    {
+                        Product = newProduct.Id,
+                        UnitAmount = sub.Prices[i],
+                        Nickname = sub.Name,
+                        Currency = "usd",
+                        Recurring = new()
+                        {
+                            Interval = i != 1? "month" : "year",
+                            IntervalCount = 1,
+                            TrialPeriodDays = 60
+                        }
+                    };
+
+                    var prodPrice = await priceSvc.CreateAsync(priceCreateOptions, cancellationToken: stoppingToken);
+                    AnsiConsole.MarkupLine(
+                        $"[Green]Created {newProduct.Name} - {newProduct.Id} - ${prodPrice.UnitAmount / 100m}[/] \n");
+                }
+            }
             _logger.LogInformation("Data Seeding Completed");
         }
         else
@@ -76,42 +120,41 @@ public class SeederWorker : BackgroundService
     }
 }
 
-
-
 public static class DemoData
 {
-    public static IEnumerable<DemoRecord> Retrieve()
+    public static IEnumerable<DemoRecord> RetrieveProducts()
     {
-        var data = new DemoRecord[] {
-            new("Stephen","Holmes","FoodieLand Night Market","foodland@example.com",
+        var data = new DemoRecord[]
+        {
+            new("Stephen", "Holmes", "FoodieLand Night Market", 
                 new("FoodieLand Night Market - Berkeley | October 8-10",
                     5500,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F137700905%2F285623250502%2F1%2Foriginal.20210604-004626?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=cea8d8fa42dee21c5740c5de763915a4"
                 )
             ),
 
-            new("Rachel","Wilkins","Craft Hospitality","craft_hospitality@example.com",
+            new("Rachel", "Wilkins", "Craft Hospitality", 
                 new("San Francisco Coffee Festival 2021",
                     6900,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F108330301%2F35694333470%2F1%2Foriginal.20200811-200320?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C150%2C1348%2C674&s=c5f8ca6e7bd6900fae94dbc098b932a7"
                 )
             ),
 
-            new("Angela","Bruton","Shipyard Trust for the Arts","shipyardarts@example.com",
+            new("Angela", "Bruton", "Shipyard Trust for the Arts", 
                 new("Shipyard Open Studios 2021",
                     1400,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F141827421%2F165638753394%2F1%2Foriginal.20210716-073309?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C22%2C1920%2C960&s=13b4f039611eb487131e34d027cc8a5c"
                 )
             ),
 
-            new("Jane","Diaz","Young Art Records","tokimonsta@example.com",
+            new("Jane", "Diaz", "Young Art Records", 
                 new("TOKiMONSTA presented by Young Art Records",
                     3500,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F144134661%2F481588047555%2F1%2Foriginal.20210810-174543?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C60%2C1920%2C960&s=54e54d81acde2a8b723576f016fc19ef"
                 )
             ),
 
-            new("Paul","Elliot","Holly Shaw and the Performers & Creators Lab","hollyshaw@example.com",
+            new("Paul", "Elliot", "Holly Shaw and the Performers & Creators Lab", 
                 new("The Comedy Edge: Stand-Up on the Waterfront",
                     2000,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F116415537%2F38806056114%2F1%2Foriginal.20201031-204217?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=1ab11e65f9bf740b9411d67ccdde50ad"
@@ -119,21 +162,21 @@ public static class DemoData
             ),
 
 
-            new("Curtis","Hall","District Six San Francisco","district6@example.com",
-                new ("The Night Market",
+            new("Curtis", "Hall", "District Six San Francisco", 
+                new("The Night Market",
                     2500,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F143639347%2F171723859036%2F1%2Foriginal.20210805-003841?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=178%2C22%2C1840%2C920&s=24792d3688d29247609481307ac2049d"
                 )
             ),
 
-            new("Arthur","Jenkins","Nor Cal Ski and Snowboard Festivals","norcalski@example.com",
+            new("Arthur", "Jenkins", "Nor Cal Ski and Snowboard Festivals", 
                 new("2021 San Francisco Ski & Snowboard Festival",
                     5000,
                     "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F145722117%2F23330292812%2F1%2Foriginal.20210826-185332?w=800&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=fb620a4c45c97a8a29830e8f8c356815"
                 )
             ),
 
-            new("Sally","Rock","Noise Pop","noisepop@example.com",
+            new("Sally", "Rock", "Noise Pop", 
                 new(
                     "Noise Pop 20th Street Block Party",
                     500,
@@ -141,7 +184,7 @@ public static class DemoData
                 )
             ),
 
-            new("Jenny","Fields","Sundaze San Francisco","sundaze@example.com",
+            new("Jenny", "Fields", "Sundaze San Francisco",
                 new(
                     "Sundaze Brunch & Marketplace",
                     17500,
@@ -151,15 +194,34 @@ public static class DemoData
         };
         return data;
     }
-}
 
+    public static IEnumerable<DemoSubscription> RetrieveSubscriptions()
+    {
+        var data = new DemoSubscription[]
+        {
+            new("Events Explorer Package",
+                new long[] { 20000, 220000 },
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2346&q=80"),
+            
+            new("Events Voyager Package",
+                new long[] { 35000, 385000 },
+                "https://images.unsplash.com/photo-1549937917-03ccda498729?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1364&q=80"),
+            
+            new("Events Expedition Package",
+                new long[] { 50000, 550000 },
+                "https://images.unsplash.com/photo-1575570724505-bf19736b7f7c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80")
+        };
+        return data;
+    }
+}
 
 public record DemoRecord(
     string FirstName,
     string LastName,
     string Company,
-    string Email,
     DemoProduct Product
 );
 
 public record DemoProduct(string Name, long Price, string Image);
+
+public record DemoSubscription(string Name, long[] Prices, string Image);

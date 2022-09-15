@@ -30,15 +30,16 @@ public class EventsController : ControllerBase
         var priceService = new PriceService(_stripeClient);
         var prices = await priceService.ListAsync(options);
 
-        var flattenPriceData = prices.Select(p => new
-        {
-            price_id = p.Id,
-            product_id = p.ProductId,
-            name = p.Product.Name,
-            owner = p.Product.Metadata["ownerName"],
-            unit_amount = p.UnitAmount,
-            images = p.Product.Images
-        });
+        var flattenPriceData = prices.Where(p => p.Type.Equals("one_time"))
+            .Select(p => new
+            {
+                price_id = p.Id,
+                product_id = p.ProductId,
+                name = p.Product.Name,
+                owner = p.Product.Metadata["ownerName"],
+                unit_amount = p.UnitAmount,
+                images = p.Product.Images
+            });
 
         return Ok(flattenPriceData);
     }
@@ -74,15 +75,17 @@ public class EventsController : ControllerBase
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,
         };
-        
+
         if (HttpContext.User?.Identity?.IsAuthenticated ?? false)
         {
-            var stripeCustomerIdClaim = (HttpContext.User.Identity as ClaimsIdentity)?.Claims.FirstOrDefault(c => c.Type == "stripe_customer");
+            var stripeCustomerIdClaim =
+                (HttpContext.User.Identity as ClaimsIdentity)?.Claims.FirstOrDefault(c => c.Type == "stripe_customer");
             if (stripeCustomerIdClaim is not null)
             {
                 sessionCreateOptions.Customer = stripeCustomerIdClaim.Value;
             }
         }
+
         var sessionService = new SessionService(_stripeClient);
         var session = await sessionService.CreateAsync(sessionCreateOptions);
 
