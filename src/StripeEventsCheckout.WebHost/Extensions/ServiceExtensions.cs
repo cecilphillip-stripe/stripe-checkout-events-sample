@@ -1,4 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -84,6 +87,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddAuthSetup(this IServiceCollection services, IConfiguration config)
     {
+        JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
         services.AddBff();
         services.AddAuthentication(options =>
             {
@@ -114,7 +118,13 @@ public static class ServiceCollectionExtensions
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
+                options.Scope.Add("email");
+                options.Scope.Add("stripe");
                 options.Scope.Add("offline_access");
+                
+                //custom claims mapping
+                options.ClaimActions.MapUniqueJsonKey("stripe_customer", "stripe_customer");
+                options.ClaimActions.MapUniqueJsonKey(JwtClaimTypes.Role, JwtClaimTypes.Role);
             });
 
         return services;

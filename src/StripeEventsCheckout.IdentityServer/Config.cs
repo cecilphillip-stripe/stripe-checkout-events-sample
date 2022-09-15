@@ -1,4 +1,5 @@
 ﻿using Duende.IdentityServer.Models;
+using IdentityModel;
 
 namespace StripeEventsCheckout.IdentityServer;
 
@@ -8,7 +9,9 @@ public static class Config
         new IdentityResource[]
         {
             new IdentityResources.OpenId(),
-            new IdentityResources.Profile()
+            new IdentityResources.Profile(),
+            new IdentityResources.Email(),
+            new IdentityResource(name: "stripe",new[] {"stripe_customer", JwtClaimTypes.Role})
         };
 
     public static IEnumerable<Client> Clients =>
@@ -20,12 +23,10 @@ public static class Config
                 ClientSecrets = { new Secret("morpheus".Sha256()) },
                   
                 AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile" },
+                AllowedScopes = { "openid", "profile", "email", "stripe" },
                 AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-
+                
                 RedirectUris = { "https://localhost:4242/signin-oidc" },
-                    
-                //FrontChannelLogoutUri = "https://localhost:5002/signout-oidc",
                 BackChannelLogoutUri = "https://localhost:4242/bff/backchannel",
                 PostLogoutRedirectUris = { "https://localhost:4242/signout-callback-oidc" }
             },

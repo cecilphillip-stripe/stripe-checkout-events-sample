@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
@@ -46,7 +47,7 @@ public class EventsController : ControllerBase
     public async Task<ActionResult> CreateCheckoutSession(CheckoutSessionRequest payload)
     {
         var baseUrl = $"{Request.Scheme}://{Request.Host}";
-        var options = new SessionCreateOptions
+        var sessionCreateOptions = new SessionCreateOptions
         {
             LineItems = new List<SessionLineItemOptions>
             {
@@ -73,8 +74,17 @@ public class EventsController : ControllerBase
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,
         };
-        var service = new SessionService(_stripeClient);
-        var session = await service.CreateAsync(options);
+        
+        if (HttpContext.User?.Identity?.IsAuthenticated ?? false)
+        {
+            var stripeCustomerIdClaim = (HttpContext.User.Identity as ClaimsIdentity)?.Claims.FirstOrDefault(c => c.Type == "stripe_customer");
+            if (stripeCustomerIdClaim is not null)
+            {
+                sessionCreateOptions.Customer = stripeCustomerIdClaim.Value;
+            }
+        }
+        var sessionService = new SessionService(_stripeClient);
+        var session = await sessionService.CreateAsync(sessionCreateOptions);
 
         return Ok(new { session.Url });
     }
