@@ -25,13 +25,13 @@ public class EventsController : ControllerBase
         {
             Limit = 40,
             Active = true,
-            Expand = new List<string> { "data.product" }
+            Expand = new List<string> { "data.product" },
+            Type = "one_time"
         };
         var priceService = new PriceService(_stripeClient);
         var prices = await priceService.ListAsync(options);
 
-        var flattenPriceData = prices.Where(p => p.Type.Equals("one_time"))
-            .Select(p => new
+        var flattenPriceData = prices.Select(p => new
             {
                 price_id = p.Id,
                 product_id = p.ProductId,
