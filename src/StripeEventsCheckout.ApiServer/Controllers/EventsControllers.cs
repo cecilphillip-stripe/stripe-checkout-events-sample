@@ -24,7 +24,8 @@ public class EventsController : ControllerBase
         {
             Limit = 40,
             Active = true,
-            Expand = new List<string> { "data.product" }
+            Expand = new List<string> { "data.product" },
+            Type = "one_time"
         };
         var priceService = new PriceService(_stripeClient);
         var prices = await priceService.ListAsync(options);
