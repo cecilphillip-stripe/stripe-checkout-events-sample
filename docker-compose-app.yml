@@ -12,7 +12,7 @@ services:
       - "5276:5276"
   
   website_dapr:
-    image: "daprio/daprd:1.7.4"
+    image: "daprio/daprd:1.9.0"
     command:
       [
         "./daprd",
@@ -44,7 +44,7 @@ services:
       - "5180:5180"
   
   orderprocessor_dapr:
-    image: "daprio/daprd:1.7.4"
+    image: "daprio/daprd:1.9.0"
     command:
       [
         "./daprd",
