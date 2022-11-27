@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "stripe-events"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-yxxjjyp5qung"
+s3_bucket = "sam-template-store"
 s3_prefix = "stripe-events"
 region = "us-east-1"
 confirm_changeset = true

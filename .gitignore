@@ -192,3 +192,4 @@ OpenCover/
 node_modules/
 tmp/
 .env
+.aws-sam

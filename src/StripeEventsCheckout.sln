@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.ApiSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.BlazorUI", "StripeEventsCheckout.BlazorUI\StripeEventsCheckout.BlazorUI.csproj", "{401F29EF-F1DB-4B49-9F58-BF055B81B27C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeCheckoutEvents.Serverless", "StripeCheckoutEvents.Serverless\src\StripeCheckoutEvents.Serverless\StripeCheckoutEvents.Serverless.csproj", "{7F54D62D-46EB-4575-8DB8-F5DD3102BD9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeCheckoutEvents.Serverless", "StripeCheckoutEvents.Serverless\StripeCheckoutEvents.Serverless.csproj", "{7F54D62D-46EB-4575-8DB8-F5DD3102BD9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

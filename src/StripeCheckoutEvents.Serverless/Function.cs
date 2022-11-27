@@ -26,12 +26,12 @@ public class Function
     /// <param name="evnt"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
+    public async Task FunctionHandler(string evnt, ILambdaContext context)
     {
-        foreach (var message in evnt.Records)
-        {
-            await ProcessMessageAsync(message, context);
-        }
+        // foreach (var message in evnt.Records)
+        // {
+        //     await ProcessMessageAsync(message, context);
+        // }
     }
 
     private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
