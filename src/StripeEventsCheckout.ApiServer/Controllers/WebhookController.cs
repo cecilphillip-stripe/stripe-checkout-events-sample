@@ -1,8 +1,14 @@
+using System.Net.Mime;
+using System.Text;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using CloudNative.CloudEvents;
+using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
+using StripeEventsCheckout.ApiServer.Models;
 using StripeEventsCheckout.ApiServer.Models.Config;
-using StripeEventsCheckout.ApiServer.Services;
 
 namespace StripeEventsCheckout.ApiServer.Controllers;
 
@@ -10,17 +16,15 @@ namespace StripeEventsCheckout.ApiServer.Controllers;
 [Route("[controller]")]
 public class WebhookController : ControllerBase
 {
-    private readonly IStripeClient _stripeClient;
-    private readonly IMessageSender _messenger;
     private readonly ILogger<WebhookController> _logger;
+    private readonly IAmazonSQS _sqsClient;
     private readonly IOptions<StripeOptions> _stripeConfig;
 
-    public WebhookController(IStripeClient stripeClient, IMessageSender messenger, ILogger<WebhookController> logger,
-        IOptions<StripeOptions> stripeConfig)
+    public WebhookController(IAmazonSQS sqsClient, ILogger<WebhookController> logger,
+         IOptions<StripeOptions> stripeConfig)
     {
-        _stripeClient = stripeClient;
-        _messenger = messenger;
         _logger = logger;
+        _sqsClient = sqsClient;
         _stripeConfig = stripeConfig;
     }
 
@@ -49,14 +53,31 @@ public class WebhookController : ControllerBase
                     {
                         try
                         {
-                            var recipient = _messenger switch
+                            var cloudEvent = new CloudEvent
                             {
-                                TwilioMessageSender => checkoutSession.CustomerDetails.Phone,
-                                SendGridMessageSender => checkoutSession.CustomerDetails.Email,
-                                _ => throw new ArgumentException("Unsupported Type")
+                                Id = Guid.NewGuid().ToString("N"),
+                                Type = $"stripe.{Events.CheckoutSessionCompleted}",
+                                Source = new Uri("urn:stripeEventsCheckout:apiServer:webhook"),
+                                DataContentType = MediaTypeNames.Application.Json,
+                                Data = new QueueMessagePayload(checkoutSession.Id, checkoutSession.Status)
                             };
+                            
+                            var cloudEventFormatter = new JsonEventFormatter<QueueMessagePayload>();
+                            var encodedMsg = cloudEventFormatter.EncodeStructuredModeMessage(cloudEvent, out ContentType contentType);
+                            var encodedMsgStr = Encoding.UTF8.GetString(encodedMsg.Span);
+                            
+                            var sqsMessage = new SendMessageRequest
+                            {
+                                QueueUrl = "https://sqs.us-east-1.amazonaws.com/475533875648/stripe-events",
+                                MessageBody = encodedMsgStr,
+                                MessageAttributes = new Dictionary<string, MessageAttributeValue>
+                                {
+                                    ["contentType"] = new() {StringValue = contentType.ToString(), DataType = "String" }
+                                }
+                            };
+                            var sqsResponse = await _sqsClient.SendMessageAsync(sqsMessage);
+                            _logger.LogInformation("SQS Response Status Code => {SqsResponseHttpStatusCode}", sqsResponse.HttpStatusCode);
 
-                            await _messenger.SendMessageAsync("Your order has been successfully processed", recipient);
                         }
                         catch (Exception ex)
                         {
@@ -69,7 +90,7 @@ public class WebhookController : ControllerBase
                 case Events.CheckoutSessionExpired:
                 {
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}");
+                    _logger.LogInformation("Checkout.Session ID: {Id}", checkoutSession!.Id);
 
                     // Notify your customer about the cart
                     break;

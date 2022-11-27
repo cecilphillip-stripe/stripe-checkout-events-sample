@@ -1,6 +1,5 @@
-using SendGrid.Extensions.DependencyInjection;
+using Amazon.SQS;
 using Serilog;
-using StripeEventsCheckout.ApiServer.Services;
 using StripeEventsCheckout.ApiServer.Workers;
 
 DotNetEnv.Env.Load();
@@ -14,21 +13,7 @@ Log.Logger = new LoggerConfiguration()
 // Add services to the container.
 builder.Host.UseSerilog();
 builder.Services.AddStripe(builder.Configuration.GetSection("Stripe"));
-
-
-if ( builder.Configuration.GetValue<string>("NotifierService", "sendgrid").ToLower() == "twilio")
-{
-    builder.Services.AddTwilio(builder.Configuration.GetSection("Twilio"));
-    builder.Services.AddTransient<IMessageSender, TwilioMessageSender>();
-}
-else
-{
-    builder.Services.AddSendGrid(options =>
-    {
-        options.ApiKey = builder.Configuration["SendGrid:ApiKey"];
-    });
-    builder.Services.AddTransient<IMessageSender, SendGridMessageSender>();
-}
+builder.Services.AddTransient<IAmazonSQS, AmazonSQSClient>();
 
 builder.Services.AddControllers();
 

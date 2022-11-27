@@ -3,8 +3,6 @@ using MongoDB.Driver.Linq;
 using Stripe;
 using StripeEventsCheckout.ApiServer.Data;
 using StripeEventsCheckout.ApiServer.Models.Config;
-using Twilio;
-using Twilio.Clients;
 
 public static class ServiceCollectionExtensions
 {
@@ -43,35 +41,14 @@ public static class ServiceCollectionExtensions
         {
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var httpClient = new SystemNetHttpClient(
-               httpClient: clientFactory.CreateClient("Stripe"),
-               maxNetworkRetries: StripeConfiguration.MaxNetworkRetries,
-               appInfo: appInfo,
-               enableTelemetry: StripeConfiguration.EnableTelemetry);
+                httpClient: clientFactory.CreateClient("Stripe"),
+                maxNetworkRetries: StripeConfiguration.MaxNetworkRetries,
+                appInfo: appInfo,
+                enableTelemetry: StripeConfiguration.EnableTelemetry);
 
             return new StripeClient(apiKey: StripeConfiguration.ApiKey, httpClient: httpClient);
         });
 
-        return services;
-    }
-
-    public static IServiceCollection AddTwilio(this IServiceCollection services, IConfiguration config)
-    {
-        string accountSid = config["AccountSID"];
-        string authToken = config["AuthToken"];
-        TwilioClient.Init(accountSid, authToken);
-
-        services.Configure<TwilioOptions>(config);
-        services.AddHttpClient("Twilio");
-        services.AddTransient<ITwilioRestClient, TwilioRestClient>(s =>
-        {
-            var clientFactory = s.GetRequiredService<IHttpClientFactory>();
-            var twilioRestClient = new TwilioRestClient(accountSid, authToken,
-                     httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
-
-            TwilioClient.SetRestClient(twilioRestClient);
-
-            return twilioRestClient;
-        });
         return services;
     }
 }
