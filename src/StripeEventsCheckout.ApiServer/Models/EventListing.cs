@@ -22,3 +22,5 @@ public class EventListing
         public string StateCode { get; set; } = string.Empty;
     }
 }
+
+public record QueueMessagePayload(string CheckoutSessionID, string Status);
