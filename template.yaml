@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Stripe Events SAM Template
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  EventsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: stripe-events
+      DelaySeconds: 0
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EventsQueueDLQ.Arn
+        maxReceiveCount: 3
+      Tags:
+        - Key: purpose
+          Value: "stripe demo"
+        - Key: apptype
+          Value: "serverless"
+  
+  EventsQueueDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: stripe-events-dlq
+      DelaySeconds: 0
+      Tags:
+        - Key: purpose
+          Value: "stripe demo"
+        - Key: apptype
+          Value: "serverless"
+
+    
+  WebhookProcessor:
+
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: "stripe-webhook-processor"
+      PackageType: Zip
+      CodeUri: ./src/StripeCheckoutEvents.Serverless/
+      Handler: StripeCheckoutEvents.Serverless::StripeCheckoutEvents.Serverless.Function::FunctionHandler
+      Runtime: dotnet6
+      Architectures:
+        - x86_64
+      MemorySize: 256
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+      Events:
+        SQS:
+          Type: SQS # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Enabled: true
+            BatchSize: 1
+            Queue: !GetAtt EventsQueue.Arn          
+
+
