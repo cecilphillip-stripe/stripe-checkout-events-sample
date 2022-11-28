@@ -62,14 +62,14 @@ public class EventsController : ControllerBase
             {
                 Promotions = "auto"
             },
-            PhoneNumberCollection = new()
-            {
-                Enabled = true,
-            },
-            ShippingAddressCollection = new()
-            {
-                AllowedCountries = new List<string> { "US" }
-            },
+            // PhoneNumberCollection = new()
+            // {
+            //     Enabled = true,
+            // },
+            // ShippingAddressCollection = new()
+            // {
+            //     AllowedCountries = new List<string> { "US" }
+            // },
             //SuccessUrl = baseUrl + "/success?session_id={CHECKOUT_SESSION_ID}",
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,

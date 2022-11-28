@@ -49,7 +49,7 @@ public class WebhookController : ControllerBase
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
                     _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}", checkoutSession!.Id, checkoutSession.Status);
 
-                    if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
+                    if (checkoutSession.Status == "complete")
                     {
                         try
                         {

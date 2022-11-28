@@ -1,0 +1,25 @@
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{\"specversion\":\"1.0\",\"id\":\"2a7b19497e4a48c6948bbafba88eddc7\",\"type\":\"stripe.checkout.session.completed\",\"source\":\"urn:stripeEventsCheckout:apiServer:webhook\",\"datacontenttype\":\"application/json\",\"data\":{\"CheckoutSessionID\":\"cs_test_a1V1YJleVKXUzgz4bH5gwWKPOxE6EgiRL7b52dWc5C3Dmy0kOcJ3ObWv0S\",\"Status\":\"complete\"}}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {
+        "contentType": {
+          "DataType": "String",
+          "StringValue": "application/cloudevents+json; charset=utf-8"
+        }
+      },
+      "md5OfBody": "{{{md5_of_body}}}",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:MyQueue",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}

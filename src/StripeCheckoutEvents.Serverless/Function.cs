@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
-using CloudNative.CloudEvents;
+using CloudNative.CloudEvents.Core;
 using CloudNative.CloudEvents.SystemTextJson;
 
 
@@ -21,7 +21,6 @@ public class Function
     {
     }
 
-
     /// <summary>
     /// This method is called for every Lambda invocation. This method takes in an SQS event object and can be used 
     /// to respond to SQS messages.
@@ -32,21 +31,33 @@ public class Function
     public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
     {
         foreach (var message in evnt.Records)
-        {  
+        {
             context.Logger.LogInformation($"Processing message => {message.MessageId}");
-            
             await ProcessMessageAsync(message, context);
         }
     }
 
     private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
     {
-        context.Logger.LogInformation($"SQS Message body {message.Body}");
-        using var jDoc = JsonDocument.Parse(message.Body);
-        var cloudEventFormatter = new JsonEventFormatter<QueueMessagePayload>();
-        var cloudEvent = cloudEventFormatter.ConvertFromJsonElement(jDoc.RootElement, null);
-        await Task.CompletedTask;
+        context.Logger.LogInformation($"SQS Message body => {message.Body}");
+       
+        if (message.MessageAttributes.ContainsKey("contentType"))
+        {
+             var contentType = message.MessageAttributes["contentType"].StringValue;
+             context.Logger.LogInformation($"SQS Message Data contentType => {contentType}");
+             if (MimeUtilities.IsCloudEventsContentType(contentType))
+             {
+                 using var jDoc = JsonDocument.Parse(message.Body);
+                 var cloudEventFormatter = new JsonEventFormatter<QueueMessagePayload>();
+                 var cloudEvent = cloudEventFormatter.ConvertFromJsonElement(jDoc.RootElement, null);
+                 var cloudEventData = cloudEvent.Data as QueueMessagePayload;
+                 context.Logger.LogInformation($"Parsed Cloud event => {cloudEvent.Id}");
+                 context.Logger.LogInformation(
+                     $"Initiating fulfillment workflow for checkout session  => {cloudEventData.CheckoutSessionID}");
+             }
+        }
         
+        await Task.CompletedTask;
         context.Logger.LogInformation($"Processed message => {message.MessageId}");
     }
 }
