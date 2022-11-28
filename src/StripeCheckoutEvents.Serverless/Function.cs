@@ -1,5 +1,8 @@
+using System.Text.Json;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
+using CloudNative.CloudEvents;
+using CloudNative.CloudEvents.SystemTextJson;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -26,19 +29,26 @@ public class Function
     /// <param name="evnt"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public async Task FunctionHandler(string evnt, ILambdaContext context)
+    public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
     {
-        // foreach (var message in evnt.Records)
-        // {
-        //     await ProcessMessageAsync(message, context);
-        // }
+        foreach (var message in evnt.Records)
+        {  
+            context.Logger.LogInformation($"Processing message => {message.MessageId}");
+            
+            await ProcessMessageAsync(message, context);
+        }
     }
 
     private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
     {
-        context.Logger.LogInformation($"Processed message {message.Body}");
-
-        // TODO: Do interesting work based on the new message
+        context.Logger.LogInformation($"SQS Message body {message.Body}");
+        using var jDoc = JsonDocument.Parse(message.Body);
+        var cloudEventFormatter = new JsonEventFormatter<QueueMessagePayload>();
+        var cloudEvent = cloudEventFormatter.ConvertFromJsonElement(jDoc.RootElement, null);
         await Task.CompletedTask;
+        
+        context.Logger.LogInformation($"Processed message => {message.MessageId}");
     }
 }
+
+public record QueueMessagePayload(string CheckoutSessionID, string Status);
