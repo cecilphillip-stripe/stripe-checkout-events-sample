@@ -17,9 +17,9 @@ public class MongoDataStore : ICustomerDataStore
         _mongodbSettings = mongodbOptions.Value;
         _database = mongoClient.GetDatabase(_mongodbSettings.DatabaseName);
         _faker = new Faker<Customer>("en_US").StrictMode(false)
-            .RuleFor(u => u.CustomerId, (f, u) => $"SEC-{string.Join("", f.Random.Digits(5))}")
+            .RuleFor(u => u.CustomerId, (f, u) => $"cust-{string.Join("", f.Random.Digits(5))}")
             .RuleFor(u => u.PhoneNumber, (f, u) => f.Phone.PhoneNumber("321-###-####"))
-            .RuleFor(u => u.Country, (f, u) => f.Country().UnitedStates().CurrencyName );
+            .RuleFor(u => u.Country, (f, u) => f.Country().UnitedStates().Name );
     }
 
     public async Task<Customer> GetCustomerByUsername(string username)
