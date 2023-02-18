@@ -67,10 +67,10 @@ public class EventsController : ControllerBase
             {
                 Enabled = true,
             },
-            ShippingAddressCollection = new()
-            {
-                AllowedCountries = new List<string> { "US" }
-            },
+            // ShippingAddressCollection = new()
+            // {
+            //     AllowedCountries = new List<string> { "US" }
+            // },
             //SuccessUrl = baseUrl + "/success?session_id={CHECKOUT_SESSION_ID}",
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,
