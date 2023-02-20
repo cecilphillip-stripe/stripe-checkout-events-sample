@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
-using Azure.Messaging.ServiceBus;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Azure;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Stripe;
@@ -64,16 +64,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration config)
     {
         services.Configure<ServiceBusOptions>(config);
-        services.AddSingleton<ServiceBusClient>(provider =>
+        services.AddAzureClients(builder =>
         {
-            var sbHostName = config.GetValue<string>("Endpoint");
-            var clientOptions = new ServiceBusClientOptions
-            {
-                TransportType = ServiceBusTransportType.AmqpWebSockets
-            };
-            
-            var client = new ServiceBusClient(sbHostName, clientOptions);
-            return client;
+            builder.AddServiceBusClient(config["Endpoint"])
+                .ConfigureOptions(options =>
+                {
+                    options.Identifier = "StripeEventsCheckout";
+                });
         });
         services.AddTransient<IMessageSender, ServiceBusMessageSender>();
         return services;

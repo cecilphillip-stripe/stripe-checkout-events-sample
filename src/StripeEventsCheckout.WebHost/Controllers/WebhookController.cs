@@ -34,7 +34,7 @@ public class WebhookController : ControllerBase
         {
             var stripeEvent = EventUtility.ConstructEvent(payload,
                 Request.Headers["Stripe-Signature"],
-                _stripeConfig.Value.WebhookSecret, throwOnApiVersionMismatch:false
+                _stripeConfig.Value.WebhookSecret, throwOnApiVersionMismatch: false
             );
 
             _logger.LogInformation($"Webhook notification with type: {stripeEvent.Type} found for {stripeEvent.Id}");
@@ -45,22 +45,41 @@ public class WebhookController : ControllerBase
                 case Events.CheckoutSessionCompleted:
                 {
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}", checkoutSession!.Id, checkoutSession.Status);
+                    _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}",
+                        checkoutSession!.Id, checkoutSession.Status);
 
-                    if (checkoutSession.Status == "complete")
+                    if (checkoutSession.Status == "complete" && checkoutSession.PaymentStatus == "paid")
                     {
-                        var messageData = new { checkoutSession.Id, checkoutSession.Status, Event = Events.CheckoutSessionCompleted };
+                        var messageData = new EventPayload(checkoutSession.Id, checkoutSession.Status,
+                            Events.CheckoutSessionCompleted);
                         var serializedMessageData = JsonSerializer.Serialize(messageData);
-                        await _messenger.SendMessageAsync(serializedMessageData, _sbConfig.Value.QueueName, MediaTypeNames.Application.Json);
+
+                        await _messenger.SendMessageAsync(serializedMessageData, _sbConfig.Value.CheckoutEntityName,
+                            MediaTypeNames.Application.Json, new Dictionary<string, string>
+                            {
+                                ["stripe-event"] = messageData.Event,
+                                ["payment-status"] = "paid"
+                            });
                     }
+
                     break;
                 }
+                //TODO: Test in CLI
                 case Events.CheckoutSessionExpired:
                 {
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                    _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}");
+                    _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id} expired");
 
-                    // Notify your customer about the cart
+                    var messageData = new EventPayload(checkoutSession.Id, checkoutSession.Status,
+                        Events.CheckoutSessionExpired);
+                    var serializedMessageData = JsonSerializer.Serialize(messageData);
+
+                    await _messenger.SendMessageAsync(serializedMessageData, _sbConfig.Value.CheckoutEntityName,
+                        MediaTypeNames.Application.Json, new Dictionary<string, string>
+                        {
+                            ["stripe-event"] = messageData.Event
+                        });
+
                     break;
                 }
                 default:
@@ -82,3 +101,5 @@ public class WebhookController : ControllerBase
         }
     }
 }
+
+record class EventPayload(string CheckoutId, string Status, string Event);
