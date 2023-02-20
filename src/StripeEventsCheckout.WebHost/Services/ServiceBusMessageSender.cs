@@ -17,7 +17,7 @@ public class ServiceBusMessageSender: IMessageSender
         _sbOptions = sbOptions.Value;
     }
     
-    public async Task SendMessageAsync(string message, string receiver, string contentType)
+    public async Task SendMessageAsync(string message, string receiver, string? contentType, IDictionary<string,string> metadata = null)
     {
         try
         {
@@ -26,10 +26,16 @@ public class ServiceBusMessageSender: IMessageSender
             {
                 Subject = "Stripe Checkout Event",
                 ContentType = contentType,
-                MessageId = Guid.NewGuid().ToString("N")
+                MessageId = Guid.NewGuid().ToString("N"),
             };
-
+            if (metadata is not null)
+            {
+                foreach (var (key, value) in metadata)
+                    sbMessage.ApplicationProperties.Add(key, value);
+            }
+            
             sbMessage.ApplicationProperties.Add("demo", "StripeEventsCheckout");
+
             await sender.SendMessageAsync(sbMessage);
             _logger.LogInformation("Message sent {MessageID}", sbMessage.MessageId);
         }
