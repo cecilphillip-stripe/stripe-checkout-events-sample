@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.CookiePolicy;
-using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using StripeEventsCheckout.WebHost.Extensions;
-using StripeEventsCheckout.WebHost.Services;
 using StripeEventsCheckout.WebHost.Workers;
 
 DotNetEnv.Env.Load();
@@ -20,25 +18,6 @@ builder.Services.AddStripe(builder.Configuration.GetSection("Stripe"));
 // Add auth services
 builder.Services.AddAuthSetup(builder.Configuration);
 
-var notifyBy = builder.Configuration.GetValue<string>("NotifierService");
-if ( notifyBy.Equals("twilio", StringComparison.InvariantCultureIgnoreCase))
-{
-    builder.Services.AddTwilio(builder.Configuration.GetSection("Twilio"));
-    builder.Services.AddTransient<IMessageSender, TwilioMessageSender>();
-}
-else if( notifyBy.Equals("sendgrid", StringComparison.InvariantCultureIgnoreCase))
-{
-    builder.Services.AddSendGrid(options =>
-    {
-        options.ApiKey = builder.Configuration["SendGrid:ApiKey"];
-    });
-    builder.Services.AddTransient<IMessageSender, SendGridMessageSender>();
-}
-else
-{
-    //TODO: No Op?
-}
-
 builder.Services.Configure<CookiePolicyOptions>(options => {
     options.MinimumSameSitePolicy = SameSiteMode.Strict;
     options.HttpOnly = HttpOnlyPolicy.Always;
@@ -46,6 +25,7 @@ builder.Services.Configure<CookiePolicyOptions>(options => {
 });
 
 builder.Services.AddControllers();
+builder.Services.AddServiceBus(builder.Configuration.GetSection("ServiceBus"));
 
 if (builder.Configuration.GetValue<bool>("SeedProductData"))
 {

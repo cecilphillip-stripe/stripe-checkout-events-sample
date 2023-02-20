@@ -1,3 +1,5 @@
+using System.Net.Mime;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -10,18 +12,18 @@ namespace StripeEventsCheckout.WebHost.Controllers;
 [Route("[controller]")]
 public class WebhookController : ControllerBase
 {
-    private readonly IStripeClient _stripeClient;
     private readonly IMessageSender _messenger;
     private readonly ILogger<WebhookController> _logger;
     private readonly IOptions<StripeOptions> _stripeConfig;
+    private readonly IOptions<ServiceBusOptions> _sbConfig;
 
     public WebhookController(IStripeClient stripeClient, IMessageSender messenger, ILogger<WebhookController> logger,
-        IOptions<StripeOptions> stripeConfig)
+        IOptions<StripeOptions> stripeConfig, IOptions<ServiceBusOptions> sbConfig)
     {
-        _stripeClient = stripeClient;
         _messenger = messenger;
         _logger = logger;
         _stripeConfig = stripeConfig;
+        _sbConfig = sbConfig;
     }
 
     [HttpPost]
@@ -45,25 +47,12 @@ public class WebhookController : ControllerBase
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
                     _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}", checkoutSession!.Id, checkoutSession.Status);
 
-                    if (checkoutSession.Status == "complete" && checkoutSession.PhoneNumberCollection.Enabled)
+                    if (checkoutSession.Status == "complete")
                     {
-                        try
-                        {
-                            var recipient = _messenger switch
-                            {
-                                TwilioMessageSender => checkoutSession.CustomerDetails.Phone,
-                                SendGridMessageSender => checkoutSession.CustomerDetails.Email,
-                                _ => throw new ArgumentException("Unsupported Type")
-                            };
-
-                            await _messenger.SendMessageAsync("Your order has been successfully processed", recipient);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, ex.Message);
-                        }
+                        var messageData = new { checkoutSession.Id, checkoutSession.Status, Event = Events.CheckoutSessionCompleted };
+                        var serializedMessageData = JsonSerializer.Serialize(messageData);
+                        await _messenger.SendMessageAsync(serializedMessageData, _sbConfig.Value.QueueName, MediaTypeNames.Application.Json);
                     }
-
                     break;
                 }
                 case Events.CheckoutSessionExpired:
@@ -72,11 +61,6 @@ public class WebhookController : ControllerBase
                     _logger.LogInformation($"Checkout.Session ID: {checkoutSession!.Id}");
 
                     // Notify your customer about the cart
-                    break;
-                }
-                case Events.CheckoutSessionAsyncPaymentSucceeded:
-                {
-                    _logger.LogInformation("Deferred payment");
                     break;
                 }
                 default:
@@ -89,6 +73,11 @@ public class WebhookController : ControllerBase
         catch (StripeException ex)
         {
             _logger.LogError(ex, ex.Message);
+            return BadRequest();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unable to process webhook");
             return BadRequest();
         }
     }

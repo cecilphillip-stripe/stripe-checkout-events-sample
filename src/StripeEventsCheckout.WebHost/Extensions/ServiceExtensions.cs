@@ -1,18 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+using Azure.Messaging.ServiceBus;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Stripe;
 using StripeEventsCheckout.WebHost.Data;
 using StripeEventsCheckout.WebHost.Models.Config;
-using Twilio;
-using Twilio.Clients;
+using StripeEventsCheckout.WebHost.Services;
 
 namespace StripeEventsCheckout.WebHost.Extensions;
 
@@ -64,24 +61,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddTwilio(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration config)
     {
-        string accountSid = config["AccountSID"];
-        string authToken = config["AuthToken"];
-        TwilioClient.Init(accountSid, authToken);
-
-        services.Configure<TwilioOptions>(config);
-        services.AddHttpClient("Twilio");
-        services.AddTransient<ITwilioRestClient, TwilioRestClient>(s =>
+        services.Configure<ServiceBusOptions>(config);
+        services.AddSingleton<ServiceBusClient>(provider =>
         {
-            var clientFactory = s.GetRequiredService<IHttpClientFactory>();
-            var twilioRestClient = new TwilioRestClient(accountSid, authToken,
-                httpClient: new Twilio.Http.SystemNetHttpClient(clientFactory.CreateClient("Twilio")));
-
-            TwilioClient.SetRestClient(twilioRestClient);
-
-            return twilioRestClient;
+            var sbHostName = config.GetValue<string>("Endpoint");
+            var clientOptions = new ServiceBusClientOptions
+            {
+                TransportType = ServiceBusTransportType.AmqpWebSockets
+            };
+            
+            var client = new ServiceBusClient(sbHostName, clientOptions);
+            return client;
         });
+        services.AddTransient<IMessageSender, ServiceBusMessageSender>();
         return services;
     }
 
@@ -99,11 +93,11 @@ public static class ServiceCollectionExtensions
             {
                 options.Cookie.Name = "__Host-blazor";
                 options.Cookie.SameSite = SameSiteMode.Strict;
-            }).AddOpenIdConnect( options =>
+            }).AddOpenIdConnect(options =>
             {
                 var openIdSettings = config.GetSection("OpenIdConnect");
                 options.Authority = openIdSettings.GetValue<string>("Authority");
-                
+
                 // confidential client using code flow + PKCE
                 options.ClientId = openIdSettings.GetValue<string>("ClientId");
                 options.ClientSecret = openIdSettings.GetValue<string>("ClientSecret");
@@ -121,7 +115,7 @@ public static class ServiceCollectionExtensions
                 options.Scope.Add("email");
                 options.Scope.Add("stripe");
                 options.Scope.Add("offline_access");
-                
+
                 //custom claims mapping
                 options.ClaimActions.MapUniqueJsonKey("stripe_customer", "stripe_customer");
                 options.ClaimActions.MapUniqueJsonKey(JwtClaimTypes.Role, JwtClaimTypes.Role);
