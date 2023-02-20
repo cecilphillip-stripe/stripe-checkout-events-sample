@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "StripeEventsCheckout.ServerlessWorker": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7206",
+      "launchBrowser": false
+    }
+  }
+}

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.Blazor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.IdentityServer", "StripeEventsCheckout.IdentityServer\StripeEventsCheckout.IdentityServer.csproj", "{563B197D-6C84-4310-ABB7-B82D155F09F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripeEventsCheckout.ServerlessWorker", "StripeEventsCheckout.ServerlessWorker\StripeEventsCheckout.ServerlessWorker.csproj", "{81FE0729-C8C1-4EF7-B499-0BDB63D54C79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{563B197D-6C84-4310-ABB7-B82D155F09F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{563B197D-6C84-4310-ABB7-B82D155F09F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{563B197D-6C84-4310-ABB7-B82D155F09F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81FE0729-C8C1-4EF7-B499-0BDB63D54C79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81FE0729-C8C1-4EF7-B499-0BDB63D54C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81FE0729-C8C1-4EF7-B499-0BDB63D54C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81FE0729-C8C1-4EF7-B499-0BDB63D54C79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
