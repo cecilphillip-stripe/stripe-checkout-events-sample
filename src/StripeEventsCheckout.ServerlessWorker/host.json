@@ -10,7 +10,13 @@
     },
     "extensions": {
         "serviceBus": {
-            "autoCompleteMessages": false,
+            "clientRetryOptions":{
+                "mode": "exponential",
+                "tryTimeout": "00:01:00",
+                "maxDelay": "00:02:00",
+                "maxRetries": 3
+            },
+            "autoCompleteMessages": true,
             "maxConcurrentCalls": 16,
             "maxConcurrentSessions": 8,
             "maxConcurrentCalls": 16,
