@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
 
         var appInfo = new AppInfo
         {
-            Name = "StripeEvents",
+            Name = "StripeEvents (Azure)",
             Version = "0.1.0"
         };
         StripeConfiguration.AppInfo = appInfo;

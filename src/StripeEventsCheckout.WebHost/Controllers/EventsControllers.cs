@@ -67,11 +67,7 @@ public class EventsController : ControllerBase
             {
                 Enabled = true,
             },
-            // ShippingAddressCollection = new()
-            // {
-            //     AllowedCountries = new List<string> { "US" }
-            // },
-            //SuccessUrl = baseUrl + "/success?session_id={CHECKOUT_SESSION_ID}",
+            InvoiceCreation = new SessionInvoiceCreationOptions { Enabled = true },
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,
         };
