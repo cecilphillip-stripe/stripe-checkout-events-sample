@@ -14,7 +14,10 @@
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.7.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.9.0-preview1" />
-        <PackageReference Include="Microsoft.DurableTask.Generators" Version="1.0.0-preview.1" />
+        <PackageReference Include="SendGrid" Version="9.28.1" />
+        <PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
+        <PackageReference Include="Stripe.net" Version="41.7.0" />
+        <PackageReference Include="Twilio" Version="6.2.3" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
