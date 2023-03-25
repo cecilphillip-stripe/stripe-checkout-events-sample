@@ -16,7 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.27.0" />
-        <PackageReference Include="System.Net.Http.Json" Version="7.0.0" />
+        <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
     </ItemGroup>
 
 </Project>

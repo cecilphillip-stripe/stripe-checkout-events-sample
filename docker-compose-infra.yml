@@ -34,17 +34,6 @@ services:
     depends_on:
       - mongodb
 
-  ##### Seq #####
-  seq:
-    container_name: "seq_service"
-    image: datalust/seq:2022.1
-    environment:
-      - ACCEPT_EULA=Y
-    volumes:
-      - ./tmp/seq/data:/data
-    ports:
-      - "8191:80"
-      - "5341:5341"
 networks:
   default:
     name: checkoutevents

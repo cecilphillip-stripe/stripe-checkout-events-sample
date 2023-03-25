@@ -17,7 +17,7 @@ public class ServiceBusMessageSender: IMessageSender
         _sbOptions = sbOptions.Value;
     }
     
-    public async Task SendMessageAsync(string message, string receiver, string? contentType, IDictionary<string,string> metadata = null)
+    public async Task SendMessageAsync(string message, string receiver, string? contentType, IDictionary<string,string>? metadata = null)
     {
         try
         {
@@ -37,7 +37,7 @@ public class ServiceBusMessageSender: IMessageSender
             sbMessage.ApplicationProperties.Add("demo", "StripeEventsCheckout");
 
             await sender.SendMessageAsync(sbMessage);
-            _logger.LogInformation("Message sent {MessageID}", sbMessage.MessageId);
+            _logger.LogInformation("Message sent {MessageID} to {DestinationTopicName}", sbMessage.MessageId, _sbOptions.CheckoutEntityName);
         }
         catch(Exception ex)
         {

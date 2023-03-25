@@ -4,35 +4,15 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Azure;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using Stripe;
-using StripeEventsCheckout.WebHost.Data;
 using StripeEventsCheckout.WebHost.Models.Config;
 using StripeEventsCheckout.WebHost.Services;
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace StripeEventsCheckout.WebHost.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddMongoDbServices(this IServiceCollection services, IConfiguration config)
-    {
-        services.Configure<MongoDatabaseOptions>(config.GetSection("MongoDatabase"));
-        services.AddSingleton<IMongoClient>(provider =>
-        {
-            var settings = MongoClientSettings.FromConnectionString(config["MongoDatabase:ConnectionString"]);
-
-            // Setting the version of the Stable API
-            settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-            settings.LinqProvider = LinqProvider.V3;
-            return new MongoClient(settings);
-        });
-
-        services.AddTransient<IEventListingDataStore, MongoDataStore>();
-
-        return services;
-    }
-
     public static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration config)
     {
         StripeConfiguration.ApiKey = config["SecretKey"];
