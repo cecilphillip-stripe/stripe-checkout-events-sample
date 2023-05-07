@@ -7,7 +7,7 @@ This sample is split into a few  projects
 * [StripeEventsCheckout.Tools](src/StripeEventsCheckout.Tools) - .NET CLI tool for seeding Stripe product data. (**Unneeded**. Kept just for reference)
 
 ## Requirements
-* .NET SDK 6.0+ 
+* .NET SDK 7.0+ 
 * [Stripe Account](https://dashboard.stripe.com/register)
 * [Stripe CLI](https://stripe.com/docs/stripe-cli)
 
@@ -90,3 +90,5 @@ Run the following command from the root directory of the project
 ```bash
 > docker compose -f docker-compose-app.yml -f docker-compose-infra.yml up
 ```
+## TODO
+Replace Mongo with Cosmos DB

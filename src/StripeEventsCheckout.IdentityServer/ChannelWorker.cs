@@ -20,26 +20,39 @@ public class ChannelWorker: BackgroundService
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var customerService = new CustomerService(_stripeClient);
         while (await _notifier.CreateStripeAccountReader.WaitToReadAsync(stoppingToken))
         {
-            // Create customer associated customer object in Stripe
-            if (_notifier.CreateStripeAccountReader.TryRead(out var item))
+            if (!_notifier.CreateStripeAccountReader.TryRead(out var item)) continue;
+            var customerService = new CustomerService(_stripeClient);
+            
+            // Search for customer first before
+            var searchOptions = new CustomerSearchOptions
+            {
+                Query = $"email:'{item.Email}'",
+                Limit = 1
+            };
+            var searchResult = await customerService.SearchAsync(searchOptions, cancellationToken: stoppingToken);
+            
+            var foundCustomer = searchResult.FirstOrDefault();
+            if (foundCustomer is null)
             {
                 var createOptions = new CustomerCreateOptions
                 {
                     Email = item.Email,
                     Phone = item.PhoneNumber,
                     Name = $"{item.FirstName} {item.LastName}",
-                    Metadata = new()
+                    Metadata = new Dictionary<string, string>
                     {
                         ["user_id"] = item.CustomerId,
                         ["app_source"] = nameof(StripeEventsCheckout)
                     }
                 };
-                var createdStripeCustomer = await customerService.CreateAsync(createOptions, cancellationToken: stoppingToken);
-                _ = await _dataStore.SetStripeCustomerInfo(item.CustomerId, createdStripeCustomer.Id);
+            
+                // Create customer associated customer object in Stripe
+                foundCustomer = await customerService.CreateAsync(createOptions, cancellationToken: stoppingToken);
             }
+            
+            _ = await _dataStore.SetStripeCustomerInfo(item.CustomerId, foundCustomer.Id);
         }
     }
 }

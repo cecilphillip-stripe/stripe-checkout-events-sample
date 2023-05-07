@@ -17,7 +17,7 @@ public class WebhookController : ControllerBase
     private readonly IOptions<StripeOptions> _stripeConfig;
     private readonly IOptions<ServiceBusOptions> _sbConfig;
 
-    public WebhookController(IStripeClient stripeClient, IMessageSender messenger, ILogger<WebhookController> logger,
+    public WebhookController(IMessageSender messenger, ILogger<WebhookController> logger,
         IOptions<StripeOptions> stripeConfig, IOptions<ServiceBusOptions> sbConfig)
     {
         _messenger = messenger;
@@ -48,7 +48,7 @@ public class WebhookController : ControllerBase
                     _logger.LogInformation("Checkout.Session ID: {CheckoutId}, Status: {CheckoutSessionStatus}",
                         checkoutSession!.Id, checkoutSession.Status);
 
-                    if (checkoutSession.Status == "complete" && checkoutSession.PaymentStatus == "paid")
+                    if (checkoutSession is { Status: "complete", PaymentStatus: "paid" })
                     {
                         var messageData = new EventPayload(checkoutSession.Id, checkoutSession.Status,
                             Events.CheckoutSessionCompleted);
@@ -64,7 +64,7 @@ public class WebhookController : ControllerBase
 
                     break;
                 }
-                //TODO: Test in CLI
+                
                 case Events.CheckoutSessionExpired:
                 {
                     var checkoutSession = stripeEvent.Data.Object as Stripe.Checkout.Session;
@@ -102,4 +102,5 @@ public class WebhookController : ControllerBase
     }
 }
 
-record class EventPayload(string CheckoutId, string Status, string Event);
+// ReSharper disable once NotAccessedPositionalProperty.Global
+record EventPayload(string CheckoutId, string Status, string Event);

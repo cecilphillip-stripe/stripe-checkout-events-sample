@@ -8,7 +8,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.12.1-preview1" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.13.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.0.0-preview3" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.0.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
@@ -16,8 +16,8 @@
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.9.0-preview1" />
         <PackageReference Include="SendGrid" Version="9.28.1" />
         <PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
-        <PackageReference Include="Stripe.net" Version="41.7.0" />
-        <PackageReference Include="Twilio" Version="6.2.3" />
+        <PackageReference Include="Stripe.net" Version="41.11.0" />
+        <PackageReference Include="Twilio" Version="6.3.0" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
