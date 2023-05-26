@@ -9,13 +9,13 @@
     <ItemGroup>
         <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
         <PackageReference Include="Blazored.SessionStorage" Version="2.3.0" />
-        <PackageReference Include="Blazored.Toast" Version="4.0.0" />
-        <PackageReference Include="IdentityModel" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.3" PrivateAssets="all" />
+        <PackageReference Include="Blazored.Toast" Version="4.1.0" />
+        <PackageReference Include="IdentityModel" Version="6.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.27.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
         <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
     </ItemGroup>
 
