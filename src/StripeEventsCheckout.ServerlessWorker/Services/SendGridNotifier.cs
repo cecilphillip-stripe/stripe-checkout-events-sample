@@ -1,10 +1,12 @@
+using LanguageExt.Common;
+using static LanguageExt.Prelude;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace StripeEventsCheckout.ServerlessWorker.Services;
-public class SendGridNotifier : INotifier
+public class SendGridNotifier 
 {
     private readonly ISendGridClient _sendGridClient;
     private readonly IConfiguration _configuration;
@@ -17,7 +19,7 @@ public class SendGridNotifier : INotifier
         _logger = logger;
     }
     
-    public async Task SendMessageAsync(string message, string receiver)
+    public async Task<Result<bool>> SendMessageAsync(string message, string receiver)
     {
         var from = new EmailAddress(_configuration["SendGrid_FromAddress"], "Stripe Event Demo");
         var to = new EmailAddress(receiver);
@@ -31,7 +33,11 @@ public class SendGridNotifier : INotifier
         msg.AddContent(MimeType.Text, message);        
         msg.AddTo(to);
 
-        var emailResponse = await _sendGridClient.SendEmailAsync(msg);
-        _logger.LogInformation("Email sent status => {EmailResponseStatusCode}", emailResponse.StatusCode);
+        var emailResponse =  await TryAsync(async () => await _sendGridClient.SendEmailAsync(msg))();
+
+        return emailResponse.Match(
+            resp => resp.IsSuccessStatusCode ? true : new Result<bool>(false),
+            e => new Result<bool>(e)
+        );
     }
 }
