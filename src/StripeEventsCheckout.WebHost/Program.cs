@@ -8,7 +8,7 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration, "Serilog")
+    .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
 // Add services to the container.

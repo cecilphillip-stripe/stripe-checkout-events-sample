@@ -1,5 +1,6 @@
 ﻿using StripeEventsCheckout.IdentityServer;
 using Serilog;
+using Serilog.Events;
 
 DotNetEnv.Env.Load();
 Log.Logger = new LoggerConfiguration()
@@ -13,6 +14,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.UseSerilog((ctx, lc) => lc
+        .MinimumLevel.Override("Serilog.AspNetCore.RequestLoggingMiddleware", LogEventLevel.Warning)
         .WriteTo.Console(
             outputTemplate:
             "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
