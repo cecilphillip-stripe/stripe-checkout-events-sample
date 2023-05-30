@@ -50,17 +50,15 @@ public class CheckoutEventsProcessor
     }
 
     [Function("WorkflowStatus")]
-    public async Task<HttpResponseData> CheckoutEventsProcessor_WorkflowStatus(
+    public HttpResponseData CheckoutEventsProcessor_WorkflowStatus(
         [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "status/{workflowId}")]
         HttpRequestData req, string workflowId,
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
         var logger = executionContext.GetLogger(nameof(CheckoutEventsProcessor_WorkflowStatus));
-        
         logger.LogInformation("Retrieving workflow => {instanceId}", workflowId);
-        var taskMetadata = await client.GetInstancesAsync(workflowId);
         
-        return client.CreateCheckStatusResponse(req, taskMetadata.InstanceId);
+        return client.CreateCheckStatusResponse(req, workflowId);
     }
 }

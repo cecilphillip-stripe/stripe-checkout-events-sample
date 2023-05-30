@@ -16,8 +16,8 @@ public static class Extensions
 
         services.Configure<TwilioOptions>(options =>
         {
-            options.AuthToken = config["Twilio_AuthToken"];
-            options.AccountSID = config["Twilio_AccountSID"];
+            options.AuthToken = authToken;
+            options.AccountSid = accountSid;
             options.PhoneNumber = config["Twilio_PhoneNumber"];
         });
 
@@ -64,7 +64,7 @@ public static class Extensions
 
 public class TwilioOptions
 {
-    public string AccountSID { get; set; } = string.Empty;
+    public string AccountSid { get; set; } = string.Empty;
     public string AuthToken { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
 }

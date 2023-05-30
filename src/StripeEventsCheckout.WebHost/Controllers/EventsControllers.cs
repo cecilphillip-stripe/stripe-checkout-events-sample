@@ -67,6 +67,10 @@ public class EventsController : ControllerBase
             {
                 Enabled = true,
             },
+            ShippingAddressCollection = new()
+            {
+                AllowedCountries = new List<string> { "US" }
+            }, 
             InvoiceCreation = new SessionInvoiceCreationOptions { Enabled = true },
             SuccessUrl = baseUrl + $"/success",
             CancelUrl = baseUrl,

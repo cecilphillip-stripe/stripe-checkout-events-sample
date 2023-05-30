@@ -2,7 +2,10 @@ using FluentValidation;
 
 namespace StripeEventsCheckout.ServerlessWorker;
 
-public record class CheckoutEventPayload(string CheckoutId, string Status, string Event);
+public record CheckoutEventPayload(string CheckoutId, string Status, string Event)
+{
+    public string TrackingCode { get; set; } = string.Empty;
+}
 
 public class CheckoutEventPayloadValidator : AbstractValidator<CheckoutEventPayload>
 {
