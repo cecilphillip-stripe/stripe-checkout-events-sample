@@ -53,6 +53,6 @@ public class CustomerProfileService: IProfileService
     public async Task IsActiveAsync(IsActiveContext context)
     {
         var customer = await _dataStore.GetCustomerById(context.Subject.GetSubjectId());
-        context.IsActive = (customer != null);
+        context.IsActive = customer != null;
     }
 }

@@ -6,7 +6,6 @@ public static class IdentityServerBuilderExtensions
 {
     public static IIdentityServerBuilder AddMongoServices(this IIdentityServerBuilder builder)
     {
-        return builder.AddProfileService<CustomerProfileService>()
-            .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
+        return builder.AddProfileService<CustomerProfileService>();
     }
 }
