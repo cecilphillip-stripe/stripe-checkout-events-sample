@@ -1,7 +1,18 @@
 version: "3.8"
 
 services:
-
+  
+  ##### azurite #####
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: "azurite"
+    hostname: azurite
+    restart: always
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+      
   ##### MongoDB #####
   mongodb:
     container_name: mongodb
