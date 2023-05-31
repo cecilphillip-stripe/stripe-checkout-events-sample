@@ -7,7 +7,9 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     container_name: "azurite"
     hostname: azurite
-    restart: always
+    restart: unless-stopped
+    volumes:
+      - ./tmp/azurite/data:/data
     ports:
       - "10000:10000"
       - "10001:10001"

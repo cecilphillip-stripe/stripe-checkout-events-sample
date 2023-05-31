@@ -25,7 +25,7 @@ public class TwilioNotifier
             client: _twilioRestClient
         );
 
-        var sentMessage = await TryAsync(async () => await messageTask);
+        var sentMessage = await TryAsync(async () => await messageTask)();
         
         return sentMessage.Match(
             resp => resp.Status != MessageResource.StatusEnum.Failed && resp.Status != MessageResource.StatusEnum.Canceled?
